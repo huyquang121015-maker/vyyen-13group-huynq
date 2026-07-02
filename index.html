@@ -1,0 +1,2775 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vy Yến - 13 Group | Quản Lý Nhân Sự</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+
+  :root {
+    --navy:    #0f2040;
+    --navy2:   #1a3560;
+    --blue:    #2563eb;
+    --blue-l:  #3b82f6;
+    --cyan:    #06b6d4;
+    --green:   #10b981;
+    --amber:   #f59e0b;
+    --red:     #ef4444;
+    --purple:  #8b5cf6;
+    --bg:      #f0f4f8;
+    --card:    #ffffff;
+    --border:  #e2e8f0;
+    --text:    #1e293b;
+    --muted:   #64748b;
+    --sidebar: 240px;
+    --radius:  12px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar);
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%);
+    display: flex; flex-direction: column;
+    position: fixed; top:0; left:0; height:100vh;
+    z-index: 100;
+    box-shadow: 4px 0 20px rgba(0,0,0,.25);
+  }
+  .sb-logo {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .sb-logo h1 { font-size:15px; font-weight:700; color:#fff; line-height:1.3; }
+  .sb-logo p  { font-size:11px; color:rgba(255,255,255,.5); margin-top:3px; }
+  .sb-logo .dot { display:inline-block; width:8px; height:8px; background:var(--cyan); border-radius:50%; margin-right:6px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  nav { flex:1; padding:12px 0; overflow-y:auto; }
+  nav a {
+    display:flex; align-items:center; gap:10px;
+    padding: 11px 20px;
+    color: rgba(255,255,255,.65);
+    text-decoration:none; font-size:13px; font-weight:500;
+    border-left: 3px solid transparent;
+    transition: all .18s;
+    cursor:pointer;
+  }
+  nav a:hover  { color:#fff; background:rgba(255,255,255,.07); }
+  nav a.active { color:#fff; background:rgba(37,99,235,.35); border-left-color:var(--cyan); }
+  nav a .icon  { font-size:16px; width:20px; text-align:center; }
+  .sb-section  { padding:8px 20px 4px; font-size:10px; font-weight:600; color:rgba(255,255,255,.3); letter-spacing:.08em; text-transform:uppercase; }
+
+  /* ── MAIN ── */
+  #main { margin-left:var(--sidebar); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+  #topbar {
+    background:var(--card); border-bottom:1px solid var(--border);
+    padding:0 28px; height:60px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:50;
+  }
+  .topbar-left h2 { font-size:18px; font-weight:700; }
+  .topbar-left p  { font-size:12px; color:var(--muted); }
+  .topbar-right { display:flex; gap:10px; align-items:center; }
+
+  #content { padding:24px 28px; flex:1; }
+
+  /* ── CARDS & KPI ── */
+  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:16px; margin-bottom:24px; }
+  .kpi-card {
+    background:var(--card); border-radius:var(--radius);
+    padding:18px 20px; border:1px solid var(--border);
+    box-shadow:0 1px 4px rgba(0,0,0,.06);
+    position:relative; overflow:hidden;
+  }
+  .kpi-card::before {
+    content:''; position:absolute; top:0; left:0; width:4px; height:100%;
+    background: var(--accent,var(--blue));
+  }
+  .kpi-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+  .kpi-value { font-size:32px; font-weight:700; margin:6px 0 2px; color:var(--accent,var(--blue)); }
+  .kpi-sub   { font-size:12px; color:var(--muted); }
+
+  .card {
+    background:var(--card); border-radius:var(--radius);
+    border:1px solid var(--border);
+    box-shadow:0 1px 4px rgba(0,0,0,.06);
+    overflow:hidden;
+  }
+  .card-header {
+    padding:16px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .card-header h3 { font-size:15px; font-weight:600; }
+  .card-body { padding:20px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th {
+    background:#f8fafc; color:var(--muted);
+    font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em;
+    padding:10px 14px; text-align:left; border-bottom:2px solid var(--border);
+    white-space:nowrap;
+  }
+  td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#f8fafc; }
+
+  /* ── BADGES ── */
+  .badge {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 10px; border-radius:20px;
+    font-size:11px; font-weight:600; white-space:nowrap;
+  }
+  .badge-green  { background:#dcfce7; color:#15803d; }
+  .badge-red    { background:#fee2e2; color:#dc2626; }
+  .badge-amber  { background:#fef9c3; color:#a16207; }
+  .badge-blue   { background:#dbeafe; color:#1d4ed8; }
+  .badge-purple { background:#ede9fe; color:#6d28d9; }
+  .badge-gray   { background:#f1f5f9; color:#475569; }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { display:flex; align-items:center; gap:8px; }
+  .progress-bar  { flex:1; height:7px; background:#e2e8f0; border-radius:4px; overflow:hidden; min-width:70px; }
+  .progress-fill { height:100%; border-radius:4px; transition:width .4s; }
+  .progress-label{ font-size:12px; font-weight:600; min-width:34px; text-align:right; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:8px; border:none;
+    font-size:13px; font-weight:600; cursor:pointer; transition:all .15s;
+    font-family:inherit;
+  }
+  .btn-primary { background:var(--blue); color:#fff; }
+  .btn-primary:hover { background:#1d4ed8; }
+  .btn-ghost   { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .btn-ghost:hover { background:#f1f5f9; color:var(--text); }
+  .btn-danger  { background:#fee2e2; color:#dc2626; }
+  .btn-danger:hover { background:#fecaca; }
+  .btn-sm { padding:5px 10px; font-size:12px; }
+  .btn-success { background:#dcfce7; color:#15803d; }
+  .btn-success:hover { background:#bbf7d0; }
+
+  /* ── SEARCH & FILTER BAR ── */
+  .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+  .search-box { position:relative; flex:1; min-width:200px; }
+  .search-box input {
+    width:100%; padding:9px 14px 9px 36px;
+    border:1px solid var(--border); border-radius:8px;
+    font-size:13px; font-family:inherit; background:#fff;
+    outline:none; transition:border .15s;
+  }
+  .search-box input:focus { border-color:var(--blue); }
+  .search-box .si { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:15px; }
+  select.filter {
+    padding:9px 12px; border:1px solid var(--border); border-radius:8px;
+    font-size:13px; font-family:inherit; background:#fff; cursor:pointer; outline:none;
+  }
+
+  /* ── MODAL ── */
+  .overlay {
+    display:none; position:fixed; inset:0; background:rgba(15,32,64,.5);
+    z-index:200; align-items:center; justify-content:center;
+    backdrop-filter:blur(3px);
+  }
+  .overlay.show { display:flex; }
+  .modal {
+    background:var(--card); border-radius:16px;
+    width:min(760px,95vw); max-height:92vh; overflow-y:auto;
+    box-shadow:0 24px 60px rgba(0,0,0,.25);
+    animation:popIn .2s ease;
+  }
+  @keyframes popIn { from{transform:scale(.94);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal-header {
+    padding:20px 24px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; position:sticky;top:0;background:var(--card);z-index:2;
+  }
+  .modal-header h3 { font-size:17px; font-weight:700; }
+  .modal-body { padding:24px; }
+  .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--card); position:sticky;bottom:0; }
+
+  /* ── TABS in modal ── */
+  .mtabs { display:flex; gap:4px; padding:0 24px; border-bottom:1px solid var(--border); background:#f8fafc; position:sticky; top:61px; z-index:2; }
+  .mtab { padding:11px 16px; font-size:12.5px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; }
+  .mtab.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .mtab-panel { display:none; }
+  .mtab-panel.active { display:block; }
+
+  /* ── FORM ── */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-grid .span2 { grid-column:1/-1; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group label { font-size:12px; font-weight:600; color:var(--muted); }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding:9px 12px; border:1px solid var(--border); border-radius:8px;
+    font-size:13px; font-family:inherit; background:#fff; outline:none; transition:border .15s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+  .form-group textarea { resize:vertical; min-height:70px; }
+  .required::after { content:' *'; color:var(--red); }
+  .field-error { border-color:var(--red) !important; box-shadow:0 0 0 3px rgba(239,68,68,.1) !important; }
+  .err-msg { font-size:11px; color:var(--red); display:none; }
+
+  /* ── PAGES ── */
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* ── DASHBOARD charts ── */
+  .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .chart-mini { display:flex; flex-direction:column; gap:8px; }
+  .chart-row { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .chart-row .lbl { width:140px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+  .chart-row .bar-out { flex:1; height:10px; background:#f1f5f9; border-radius:5px; overflow:hidden; }
+  .chart-row .bar-in  { height:100%; border-radius:5px; transition:width .5s; }
+  .chart-row .val { width:60px; text-align:right; font-weight:600; color:var(--muted); font-size:12px; }
+
+  /* ── DEADLINE COLORS ── */
+  .overdue  { color:#dc2626; font-weight:600; }
+  .urgent   { color:#d97706; font-weight:600; }
+  .on-track { color:#16a34a; }
+
+  /* ── AVATAR ── */
+  .avatar {
+    width:32px; height:32px; border-radius:50%;
+    background:linear-gradient(135deg,var(--blue) 0%,var(--cyan) 100%);
+    color:#fff; font-size:12px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .name-cell { display:flex; align-items:center; gap:10px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position:fixed; bottom:24px; right:24px;
+    background:#1e293b; color:#fff; padding:12px 20px; border-radius:10px;
+    font-size:13px; font-weight:500; z-index:999;
+    transform:translateY(80px); opacity:0; transition:all .3s;
+    box-shadow:0 8px 24px rgba(0,0,0,.3);
+  }
+  #toast.show { transform:translateY(0); opacity:1; }
+  #toast.err { background:#dc2626; }
+
+  /* ── EMPTY STATE ── */
+  .empty { text-align:center; padding:48px 20px; color:var(--muted); }
+  .empty .ei { font-size:48px; margin-bottom:12px; }
+  .empty p { font-size:14px; }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:768px){
+    #sidebar { width:60px; }
+    #sidebar nav a span:not(.icon) { display:none; }
+    .sb-logo p,.sb-logo h1 { display:none; }
+    .sb-logo .dot { width:12px;height:12px; }
+    #main { margin-left:60px; }
+    .form-grid { grid-template-columns:1fr; }
+    .dash-grid { grid-template-columns:1fr; }
+    #content { padding:16px; }
+  }
+
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; background:#f1f5f9; color:#475569; }
+  .section-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; }
+  .action-row { display:flex; gap:6px; }
+  .dl-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+  .p-cao    { color:#dc2626; font-weight:700; }
+  .p-trung  { color:#d97706; font-weight:600; }
+  .p-thap   { color:#16a34a; font-weight:600; }
+
+  .file-chip { display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:600; margin-top:6px; }
+  .file-chip .x { cursor:pointer; color:#dc2626; font-weight:800; }
+  .helptext { font-size:11px; color:var(--muted); margin-top:2px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sb-logo">
+    <h1><span class="dot"></span>Vy Yến - 13 Group</h1>
+    <p>Quản lý nhân sự nội bộ</p>
+  </div>
+  <nav>
+    <div class="sb-section">Tổng quan</div>
+    <a class="active" onclick="show('dashboard')" data-page="dashboard"><span class="icon">🎯</span><span>Dashboard</span></a>
+
+    <div class="sb-section">Quản lý</div>
+    <a onclick="show('employees')" data-page="employees"><span class="icon">👤</span><span>Nhân Viên</span></a>
+    <a onclick="show('tasks')"     data-page="tasks"    ><span class="icon">📋</span><span>Công Việc</span></a>
+    <a onclick="show('tracking')"  data-page="tracking" ><span class="icon">📊</span><span>Theo Dõi</span></a>
+    <a onclick="show('contracts')" data-page="contracts"><span class="icon">📄</span><span>Hợp Đồng</span></a>
+    <a onclick="show('revenue')"   data-page="revenue"  ><span class="icon">💰</span><span>Doanh Thu</span></a>
+
+    <div class="sb-section">Thuê Phòng</div>
+    <a onclick="show('rooms')"    data-page="rooms"   ><span class="icon">🏠</span><span>Phòng &amp; Khách Hàng</span></a>
+    <a onclick="show('bookings')" data-page="bookings"><span class="icon">🗓️</span><span>Đặt Phòng &amp; Doanh Thu</span></a>
+    <a onclick="show('servicepay')" data-page="servicepay"><span class="icon">💼</span><span>HĐ Dịch Vụ &amp; Thanh Toán</span></a>
+
+    <div class="sb-section">Công cụ</div>
+    <a onclick="exportData()"    ><span class="icon">💾</span><span>Xuất JSON</span></a>
+    <a onclick="importData()"    ><span class="icon">📂</span><span>Nhập JSON</span></a>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="loadImport(event)">
+  </nav>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div class="topbar-left">
+      <h2 id="page-title">Dashboard</h2>
+      <p id="page-sub">Hôm nay: <span id="today-date"></span></p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" id="add-btn" onclick="openAdd()">＋ Thêm mới</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header"><h3>📊 Tiến độ theo nhân viên</h3></div>
+          <div class="card-body chart-mini" id="nv-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>⚠️ Công việc sắp đến hạn</h3></div>
+          <div class="card-body" id="deadline-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>🏢 Nhân viên theo phòng ban</h3></div>
+          <div class="card-body chart-mini" id="dept-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>💰 Doanh thu công ty 6 tháng gần nhất</h3></div>
+          <div class="card-body chart-mini" id="revenue-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>📄 Hợp đồng sắp hết hạn</h3></div>
+          <div class="card-body" id="contract-alert-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>🏆 Top doanh thu nhân viên (tháng gần nhất)</h3></div>
+          <div class="card-body chart-mini" id="top-sales-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NHÂN VIÊN ══ -->
+    <div class="page" id="page-employees">
+      <div class="toolbar">
+        <div class="search-box"><span class="si">🔍</span><input type="text" id="emp-search" placeholder="Tìm theo tên, mã, phòng ban…" oninput="renderEmployees()"></div>
+        <select class="filter" id="emp-filter-dept" onchange="renderEmployees()"><option value="">Tất cả phòng ban</option></select>
+        <select class="filter" id="emp-filter-status" onchange="renderEmployees()">
+          <option value="">Tất cả trạng thái</option>
+          <option>Đang làm việc</option><option>Thử việc</option><option>Nghỉ phép</option><option>Nghỉ việc</option>
+        </select>
+        <select class="filter" id="emp-sort" onchange="renderEmployees()">
+          <option value="name-asc">Tên A → Z</option>
+          <option value="name-desc">Tên Z → A</option>
+          <option value="join-desc">Vào làm: Mới nhất</option>
+          <option value="join-asc">Vào làm: Cũ nhất</option>
+          <option value="salary-desc">Lương: Cao → Thấp</option>
+          <option value="salary-asc">Lương: Thấp → Cao</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Mã NV</th><th>Họ và Tên</th><th>Phòng Ban</th><th>Chức Vụ</th>
+              <th>Ngày Vào</th><th>Email</th><th>Điện Thoại</th><th>Lương CB (VNĐ)</th>
+              <th>Trạng Thái</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="emp-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CÔNG VIỆC ══ -->
+    <div class="page" id="page-tasks">
+      <div class="toolbar">
+        <div class="search-box"><span class="si">🔍</span><input type="text" id="task-search" placeholder="Tìm tên công việc, dự án…" oninput="renderTasks()"></div>
+        <select class="filter" id="task-filter-priority" onchange="renderTasks()">
+          <option value="">Tất cả ưu tiên</option><option>Cao</option><option>Trung bình</option><option>Thấp</option>
+        </select>
+        <select class="filter" id="task-filter-status" onchange="renderTasks()">
+          <option value="">Tất cả trạng thái</option>
+          <option>Chưa bắt đầu</option><option>Đang thực hiện</option><option>Hoàn thành</option><option>Tạm dừng</option><option>Hủy bỏ</option>
+        </select>
+        <select class="filter" id="task-sort" onchange="renderTasks()">
+          <option value="name-asc">Tên A → Z</option>
+          <option value="name-desc">Tên Z → A</option>
+          <option value="deadline-asc">Hạn nộp: Gần nhất</option>
+          <option value="deadline-desc">Hạn nộp: Xa nhất</option>
+          <option value="start-desc">Bắt đầu: Mới nhất</option>
+          <option value="start-asc">Bắt đầu: Cũ nhất</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Mã CV</th><th>Tên Công Việc</th><th>Dự Án</th><th>Ưu Tiên</th>
+              <th>Trạng Thái</th><th>Bắt Đầu</th><th>Hạn Nộp</th><th>Người Tạo</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="task-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ THEO DÕI ══ -->
+    <div class="page" id="page-tracking">
+      <div class="toolbar">
+        <div class="search-box"><span class="si">🔍</span><input type="text" id="track-search" placeholder="Tìm tên công việc, nhân viên…" oninput="renderTracking()"></div>
+        <select class="filter" id="track-filter-nv" onchange="renderTracking()"><option value="">Tất cả nhân viên</option></select>
+        <select class="filter" id="track-filter-status" onchange="renderTracking()">
+          <option value="">Tất cả trạng thái</option>
+          <option>Chưa bắt đầu</option><option>Đang thực hiện</option><option>Hoàn thành</option><option>Tạm dừng</option><option>Hủy bỏ</option>
+        </select>
+        <select class="filter" id="track-sort" onchange="renderTracking()">
+          <option value="deadline-asc">Hạn nộp: Gần nhất</option>
+          <option value="deadline-desc">Hạn nộp: Xa nhất</option>
+          <option value="progress-desc">Tiến độ: Cao → Thấp</option>
+          <option value="progress-asc">Tiến độ: Thấp → Cao</option>
+          <option value="name-asc">Tên CV A → Z</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Tên Công Việc</th><th>Nhân Viên</th><th>Ngày Giao</th><th>Hạn Nộp</th>
+              <th>Tiến Độ</th><th>Trạng Thái</th><th>Còn Lại</th><th>Đánh Giá</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="track-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HỢP ĐỒNG ══ -->
+    <div class="page" id="page-contracts">
+      <div class="toolbar">
+        <div class="search-box"><span class="si">🔍</span><input type="text" id="contract-search" placeholder="Tìm theo nhân viên, số HĐ…" oninput="renderContracts()"></div>
+        <select class="filter" id="contract-filter-type" onchange="renderContracts()">
+          <option value="">Tất cả loại HĐ</option>
+          <option>Thử việc</option><option>Xác định thời hạn</option><option>Không xác định thời hạn</option><option>Thời vụ / Cộng tác viên</option>
+        </select>
+        <select class="filter" id="contract-filter-status" onchange="renderContracts()">
+          <option value="">Tất cả trạng thái</option>
+          <option>Còn hiệu lực</option><option>Sắp hết hạn</option><option>Đã hết hạn</option><option>Đã chấm dứt</option>
+        </select>
+        <select class="filter" id="contract-sort" onchange="renderContracts()">
+          <option value="end-asc">Hết hạn: Gần nhất</option>
+          <option value="end-desc">Hết hạn: Xa nhất</option>
+          <option value="start-desc">Bắt đầu: Mới nhất</option>
+          <option value="start-asc">Bắt đầu: Cũ nhất</option>
+          <option value="name-asc">Nhân viên A → Z</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Số HĐ</th><th>Nhân Viên</th><th>Loại HĐ</th><th>Ngày Bắt Đầu</th><th>Ngày Kết Thúc</th>
+              <th>Lương Theo HĐ</th><th>Người Ký</th><th>File HĐ</th><th>Trạng Thái</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="contract-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DOANH THU ══ -->
+    <div class="page" id="page-revenue">
+      <div class="kpi-grid" id="revenue-kpi"></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>💼 Doanh thu công ty theo tháng</h3>
+          <button class="btn btn-primary btn-sm" onclick="openCompanyRevenueModal()">＋ Thêm tháng</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tháng</th><th>Doanh Thu (VNĐ)</th><th>Chi Phí (VNĐ)</th><th>Lợi Nhuận (VNĐ)</th><th>Ghi Chú</th><th>Thao Tác</th></tr></thead>
+            <tbody id="comp-rev-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>👤 Doanh thu theo nhân viên</h3>
+          <button class="btn btn-primary btn-sm" onclick="openSalesModal()">＋ Thêm doanh thu</button>
+        </div>
+        <div class="toolbar" style="padding:16px 20px 0">
+          <select class="filter" id="sales-filter-nv" onchange="renderSales()"><option value="">Tất cả nhân viên</option></select>
+          <select class="filter" id="sales-filter-month" onchange="renderSales()"><option value="">Tất cả tháng</option></select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nhân Viên</th><th>Tháng</th><th>Doanh Thu (VNĐ)</th><th>Chỉ Tiêu (VNĐ)</th><th>Đạt %</th><th>Hoa Hồng (VNĐ)</th><th>Ghi Chú</th><th>Thao Tác</th></tr></thead>
+            <tbody id="sales-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PHÒNG & KHÁCH HÀNG ══ -->
+    <div class="page" id="page-rooms">
+      <div class="section-label" style="margin-top:4px">🏠 Danh Sách Phòng</div>
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <h3>Danh sách phòng họp / văn phòng</h3>
+          <button class="btn btn-primary btn-sm" onclick="openRoomModal()">＋ Thêm phòng</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Mã Phòng</th><th>Tên Phòng</th><th>Loại</th><th>Sức Chứa</th>
+              <th>Giá / Giờ (VNĐ)</th><th>Nhân Viên Phụ Trách</th><th>Trạng Thái</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="room-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section-label">👥 Danh Sách Khách Hàng</div>
+      <div class="toolbar">
+        <div class="search-box"><span class="si">🔍</span><input type="text" id="cust-search" placeholder="Tìm theo tên, SĐT, CCCD…" oninput="renderCustomers()"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Khách hàng thuê phòng</h3>
+          <button class="btn btn-primary btn-sm" onclick="openCustomerModal()">＋ Thêm khách hàng</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Mã KH</th><th>Tên Khách Hàng</th><th>SĐT</th><th>CCCD</th>
+              <th>Công Ty</th><th>Tổng Đã Thuê</th><th>Công Nợ</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="cust-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ĐẶT PHÒNG & DOANH THU ══ -->
+    <div class="page" id="page-bookings">
+      <div class="kpi-grid" id="booking-kpi"></div>
+
+      <div class="toolbar">
+        <div class="search-box"><span class="si">🔍</span><input type="text" id="booking-search" placeholder="Tìm theo khách hàng, phòng…" oninput="renderBookings()"></div>
+        <select class="filter" id="booking-filter-room" onchange="renderBookings()"><option value="">Tất cả phòng</option></select>
+        <select class="filter" id="booking-filter-pay" onchange="renderBookings()">
+          <option value="">Tất cả thanh toán</option><option>Đã thanh toán</option><option>Còn nợ</option><option>Đã hủy</option>
+        </select>
+        <select class="filter" id="booking-sort" onchange="renderBookings()">
+          <option value="date-desc">Ngày: Mới nhất</option>
+          <option value="date-asc">Ngày: Cũ nhất</option>
+          <option value="room-asc">Tên phòng A → Z</option>
+          <option value="total-desc">Thành tiền: Cao → Thấp</option>
+          <option value="debt-desc">Công nợ: Cao → Thấp</option>
+        </select>
+      </div>
+      <div class="toolbar">
+        <div class="form-group" style="flex:0 0 auto"><label style="font-size:11px;color:var(--muted);margin-bottom:2px">Từ ngày</label><input type="date" class="filter" id="booking-filter-from" onchange="renderBookings()"></div>
+        <div class="form-group" style="flex:0 0 auto"><label style="font-size:11px;color:var(--muted);margin-bottom:2px">Đến ngày</label><input type="date" class="filter" id="booking-filter-to" onchange="renderBookings()"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:18px" onclick="document.getElementById('booking-filter-from').value='';document.getElementById('booking-filter-to').value='';renderBookings()">✕ Xóa khoảng ngày</button>
+      </div>
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <h3>🗓️ Lịch sử đặt phòng</h3>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Mã Đặt</th><th>Phòng</th><th>Khách Hàng</th><th>Ngày Thuê</th><th>Giờ Bắt Đầu</th><th>Giờ Kết Thúc</th>
+              <th>Số Giờ</th><th>Đơn Giá</th><th>Thành Tiền</th><th>Đã Trả</th><th>Còn Nợ</th><th>NV Phụ Trách</th><th>TT Thanh Toán</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="booking-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header"><h3>🏆 Doanh thu theo phòng</h3></div>
+          <div class="card-body chart-mini" id="room-revenue-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>👤 Doanh thu theo khách hàng</h3></div>
+          <div class="card-body chart-mini" id="cust-revenue-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HỢP ĐỒNG DỊCH VỤ & THANH TOÁN ══ -->
+    <div class="page" id="page-servicepay">
+      <div class="kpi-grid" id="sp-kpi"></div>
+
+      <div class="toolbar">
+        <div class="search-box"><span class="si">🔍</span><input type="text" id="sp-search" placeholder="Tìm theo khách hàng, dịch vụ, số HĐ…" oninput="renderServicePay()"></div>
+        <select class="filter" id="sp-filter-service" onchange="renderServicePay()"><option value="">Tất cả dịch vụ</option></select>
+        <select class="filter" id="sp-filter-step" onchange="renderServicePay()">
+          <option value="">Tất cả tiến độ</option>
+          <option value="quote">Đang ở: Báo giá</option>
+          <option value="request">Đang ở: Đề nghị TT</option>
+          <option value="acceptance">Đang ở: Nghiệm thu</option>
+          <option value="payment">Đang ở: Thanh toán</option>
+          <option value="vat">Đang ở: Hóa đơn VAT</option>
+          <option value="done">Hoàn tất toàn bộ</option>
+        </select>
+        <select class="filter" id="sp-sort" onchange="renderServicePay()">
+          <option value="date-desc">Ngày: Mới nhất</option>
+          <option value="date-asc">Ngày: Cũ nhất</option>
+          <option value="total-desc">Giá trị: Cao → Thấp</option>
+          <option value="progress-asc">Tiến độ: Ít → Nhiều bước</option>
+          <option value="name-asc">Khách hàng A → Z</option>
+        </select>
+      </div>
+      <div class="toolbar">
+        <div class="form-group" style="flex:0 0 auto"><label style="font-size:11px;color:var(--muted);margin-bottom:2px">Từ ngày</label><input type="date" class="filter" id="sp-filter-from" onchange="renderServicePay()"></div>
+        <div class="form-group" style="flex:0 0 auto"><label style="font-size:11px;color:var(--muted);margin-bottom:2px">Đến ngày</label><input type="date" class="filter" id="sp-filter-to" onchange="renderServicePay()"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:18px" onclick="document.getElementById('sp-filter-from').value='';document.getElementById('sp-filter-to').value='';renderServicePay()">✕ Xóa khoảng ngày</button>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Mã HĐ</th><th>Khách Hàng</th><th>Dịch Vụ</th><th>Ngày</th><th>Giá Trị (VNĐ)</th>
+              <th>Báo Giá</th><th>Đề Nghị TT</th><th>Nghiệm Thu</th><th>Thanh Toán</th><th>Hóa Đơn VAT</th>
+              <th>Tiến Độ</th><th>NV Phụ Trách</th><th>Thao Tác</th>
+            </tr></thead>
+            <tbody id="sp-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header"><h3>🧩 Doanh thu theo dịch vụ</h3></div>
+          <div class="card-body chart-mini" id="sp-service-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>⏳ Đơn đang chờ xử lý (theo bước)</h3></div>
+          <div class="card-body" id="sp-pending-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Employee Modal (tabbed: Personal / Job / Contact) -->
+<div class="overlay" id="modal-employee">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="emp-modal-title">Thêm Nhân Viên</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-employee')">✕</button>
+    </div>
+    <div class="mtabs">
+      <div class="mtab active" data-tab="emp-tab-job" onclick="switchTab(this,'emp-tab-job')">💼 Công việc</div>
+      <div class="mtab" data-tab="emp-tab-personal" onclick="switchTab(this,'emp-tab-personal')">🪪 Cá nhân</div>
+      <div class="mtab" data-tab="emp-tab-contact" onclick="switchTab(this,'emp-tab-contact')">📞 Liên hệ &amp; Khác</div>
+    </div>
+    <div class="modal-body">
+
+      <div class="mtab-panel active" id="emp-tab-job">
+        <div class="form-grid">
+          <div class="form-group"><label class="required">Mã Nhân Viên</label><input id="e-id"><span class="err-msg">Bắt buộc &amp; không được trùng</span></div>
+          <div class="form-group"><label class="required">Họ và Tên</label><input id="e-name"><span class="err-msg">Bắt buộc</span></div>
+          <div class="form-group"><label>Phòng Ban</label>
+            <select id="e-dept">
+              <option>Kỹ Thuật</option><option>Kinh Doanh</option><option>Kế Toán</option>
+              <option>Nhân Sự</option><option>Marketing</option><option>Hành Chính</option><option>Ban Giám Đốc</option><option>Khác</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Chức Vụ</label><input id="e-position" placeholder="Nhân viên"></div>
+          <div class="form-group"><label>Ngày Vào Làm</label><input id="e-joindate" type="date"></div>
+          <div class="form-group"><label>Mức Lương Cơ Bản (VNĐ)</label><input id="e-salary" type="number" placeholder="15000000"></div>
+          <div class="form-group"><label>Trạng Thái</label>
+            <select id="e-status"><option>Đang làm việc</option><option>Thử việc</option><option>Nghỉ phép</option><option>Nghỉ việc</option></select>
+          </div>
+          <div class="form-group"><label>Mã Số Thuế TNCN</label><input id="e-taxcode" placeholder="(nếu có)"></div>
+          <div class="form-group"><label>Số Sổ BHXH</label><input id="e-socialid" placeholder="(nếu có)"></div>
+          <div class="form-group span2"><label>Ghi Chú Công Việc</label><textarea id="e-note"></textarea></div>
+        </div>
+      </div>
+
+      <div class="mtab-panel" id="emp-tab-personal">
+        <div class="form-grid">
+          <div class="form-group"><label>Giới Tính</label>
+            <select id="e-gender"><option>Nam</option><option>Nữ</option><option>Khác</option></select>
+          </div>
+          <div class="form-group"><label>Ngày Sinh</label><input id="e-dob" type="date"></div>
+          <div class="form-group"><label>Số CCCD/CMND</label><input id="e-idcard" placeholder="012345678901"></div>
+          <div class="form-group"><label>Ngày Cấp CCCD</label><input id="e-idcarddate" type="date"></div>
+          <div class="form-group span2"><label>Nơi Cấp CCCD</label><input id="e-idcardplace" placeholder="Cục CS QLHC về TTXH"></div>
+          <div class="form-group"><label>Quốc Tịch</label><input id="e-nationality" value="Việt Nam"></div>
+          <div class="form-group"><label>Tình Trạng Hôn Nhân</label>
+            <select id="e-marital"><option>Độc thân</option><option>Đã kết hôn</option><option>Khác</option></select>
+          </div>
+          <div class="form-group span2"><label>Quê Quán</label><input id="e-hometown" placeholder="Xã/Huyện/Tỉnh"></div>
+          <div class="form-group span2"><label>Địa Chỉ Thường Trú</label><input id="e-address" placeholder="123 Đường ABC, Hà Nội"></div>
+          <div class="form-group span2"><label>Trình Độ Học Vấn</label><input id="e-education" placeholder="Đại học Bách Khoa Hà Nội — Kỹ sư CNTT"></div>
+        </div>
+      </div>
+
+      <div class="mtab-panel" id="emp-tab-contact">
+        <div class="form-grid">
+          <div class="form-group"><label>Email</label><input id="e-email" type="email" placeholder="email@company.vn"></div>
+          <div class="form-group"><label>Số Điện Thoại</label><input id="e-phone" placeholder="0901234567"></div>
+          <div class="form-group"><label>Người Liên Hệ Khẩn Cấp</label><input id="e-emergency-name" placeholder="Họ tên"></div>
+          <div class="form-group"><label>SĐT Liên Hệ Khẩn Cấp</label><input id="e-emergency-phone" placeholder="09xxxxxxxx"></div>
+          <div class="form-group"><label>Quan Hệ</label><input id="e-emergency-relation" placeholder="Vợ/Chồng, Bố/Mẹ…"></div>
+          <div class="form-group"><label>Số Tài Khoản Ngân Hàng</label><input id="e-bankaccount" placeholder="0123456789"></div>
+          <div class="form-group span2"><label>Ngân Hàng</label><input id="e-bankname" placeholder="Vietcombank - Chi nhánh…"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <span style="font-size:11px;color:var(--muted)">* Bắt buộc nhập</span>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" onclick="closeModal('modal-employee')">Hủy</button>
+        <button class="btn btn-primary" onclick="saveEmployee()">💾 Lưu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task Modal -->
+<div class="overlay" id="modal-task">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="task-modal-title">Thêm Công Việc</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-task')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Mã Công Việc</label><input id="t-id"><span class="err-msg">Bắt buộc &amp; không trùng</span></div>
+        <div class="form-group"><label class="required">Tên Công Việc</label><input id="t-name"><span class="err-msg">Bắt buộc</span></div>
+        <div class="form-group"><label>Dự Án</label><input id="t-project" placeholder="Tên dự án"></div>
+        <div class="form-group"><label>Độ Ưu Tiên</label>
+          <select id="t-priority"><option>Cao</option><option>Trung bình</option><option>Thấp</option></select>
+        </div>
+        <div class="form-group"><label>Trạng Thái</label>
+          <select id="t-status"><option>Chưa bắt đầu</option><option>Đang thực hiện</option><option>Hoàn thành</option><option>Tạm dừng</option><option>Hủy bỏ</option></select>
+        </div>
+        <div class="form-group"><label>Người Tạo</label>
+          <select id="t-creator"></select>
+        </div>
+        <div class="form-group"><label>Ngày Bắt Đầu</label><input id="t-start" type="date"></div>
+        <div class="form-group"><label>Hạn Nộp</label><input id="t-deadline" type="date"></div>
+        <div class="form-group"><label>Tag</label><input id="t-tag" placeholder="Design, Finance, HR…"></div>
+        <div class="form-group span2"><label>Mô Tả</label><textarea id="t-desc" placeholder="Mô tả chi tiết công việc…"></textarea></div>
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="t-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveTask()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tracking Modal -->
+<div class="overlay" id="modal-tracking">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="track-modal-title">Giao / Cập Nhật Công Việc</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-tracking')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Công Việc</label><select id="tr-task"></select></div>
+        <div class="form-group"><label class="required">Nhân Viên</label><select id="tr-emp"></select></div>
+        <div class="form-group"><label>Ngày Giao</label><input id="tr-assigndate" type="date"></div>
+        <div class="form-group"><label>Hạn Nộp</label><input id="tr-deadline" type="date"></div>
+        <div class="form-group"><label>Tiến Độ (%)</label><input id="tr-progress" type="number" min="0" max="100" placeholder="0-100"></div>
+        <div class="form-group"><label>Trạng Thái</label>
+          <select id="tr-status"><option>Chưa bắt đầu</option><option>Đang thực hiện</option><option>Hoàn thành</option><option>Tạm dừng</option><option>Hủy bỏ</option></select>
+        </div>
+        <div class="form-group"><label>Ngày Hoàn Thành</label><input id="tr-donedate" type="date"></div>
+        <div class="form-group"><label>Đánh Giá (1-5)</label>
+          <select id="tr-rating"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        </div>
+        <div class="form-group span2"><label>Ghi Chú Nhân Viên</label><textarea id="tr-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-tracking')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveTracking()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contract Modal -->
+<div class="overlay" id="modal-contract">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="contract-modal-title">Thêm Hợp Đồng</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-contract')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Số Hợp Đồng</label><input id="c-id" placeholder="HD2024-001"><span class="err-msg">Bắt buộc &amp; không trùng</span></div>
+        <div class="form-group"><label class="required">Nhân Viên</label><select id="c-emp"></select></div>
+        <div class="form-group"><label>Loại Hợp Đồng</label>
+          <select id="c-type"><option>Thử việc</option><option>Xác định thời hạn</option><option>Không xác định thời hạn</option><option>Thời vụ / Cộng tác viên</option></select>
+        </div>
+        <div class="form-group"><label>Trạng Thái</label>
+          <select id="c-status"><option>Còn hiệu lực</option><option>Sắp hết hạn</option><option>Đã hết hạn</option><option>Đã chấm dứt</option></select>
+        </div>
+        <div class="form-group"><label>Ngày Bắt Đầu</label><input id="c-start" type="date"></div>
+        <div class="form-group"><label>Ngày Kết Thúc</label><input id="c-end" type="date"></div>
+        <div class="form-group"><label>Lương Theo Hợp Đồng (VNĐ)</label><input id="c-salary" type="number" placeholder="15000000"></div>
+        <div class="form-group"><label>Phụ Cấp (VNĐ)</label><input id="c-allowance" type="number" placeholder="0"></div>
+        <div class="form-group"><label>Người Ký (Đại diện công ty)</label><input id="c-signer" placeholder="Giám đốc Nguyễn Văn X"></div>
+        <div class="form-group"><label>Ngày Ký</label><input id="c-signdate" type="date"></div>
+        <div class="form-group span2">
+          <label>File Hợp Đồng Đính Kèm</label>
+          <input type="file" id="c-file" onchange="handleContractFile(event)">
+          <div class="helptext">Hỗ trợ PDF/ảnh/Word — file được lưu ngay trong trình duyệt (offline), dung lượng lớn có thể làm chậm việc lưu dữ liệu.</div>
+          <div id="c-file-chip"></div>
+        </div>
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="c-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-contract')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveContract()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Company Revenue Modal -->
+<div class="overlay" id="modal-comp-revenue">
+  <div class="modal" style="width:min(480px,95vw)">
+    <div class="modal-header">
+      <h3 id="comp-rev-modal-title">Thêm Doanh Thu Công Ty</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-comp-revenue')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group span2"><label class="required">Tháng</label><input id="cr-month" type="month"><span class="err-msg">Bắt buộc &amp; không trùng</span></div>
+        <div class="form-group"><label>Doanh Thu (VNĐ)</label><input id="cr-revenue" type="number" placeholder="500000000"></div>
+        <div class="form-group"><label>Chi Phí (VNĐ)</label><input id="cr-cost" type="number" placeholder="300000000"></div>
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="cr-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-comp-revenue')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveCompanyRevenue()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sales (Employee Revenue) Modal -->
+<div class="overlay" id="modal-sales">
+  <div class="modal" style="width:min(520px,95vw)">
+    <div class="modal-header">
+      <h3 id="sales-modal-title">Thêm Doanh Thu Nhân Viên</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-sales')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Nhân Viên</label><select id="s-emp"></select></div>
+        <div class="form-group"><label class="required">Tháng</label><input id="s-month" type="month"></div>
+        <div class="form-group"><label>Doanh Thu (VNĐ)</label><input id="s-revenue" type="number" placeholder="80000000"></div>
+        <div class="form-group"><label>Chỉ Tiêu (VNĐ)</label><input id="s-target" type="number" placeholder="100000000"></div>
+        <div class="form-group span2"><label>Hoa Hồng (VNĐ)</label><input id="s-commission" type="number" placeholder="4000000"></div>
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="s-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-sales')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveSales()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Room Modal -->
+<div class="overlay" id="modal-room">
+  <div class="modal" style="width:min(520px,95vw)">
+    <div class="modal-header">
+      <h3 id="room-modal-title">Thêm Phòng</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-room')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Mã Phòng</label><input id="r-id" placeholder="P001"><span class="err-msg">Bắt buộc &amp; không trùng</span></div>
+        <div class="form-group"><label class="required">Tên Phòng</label><input id="r-name" placeholder="Phòng họp Lotus"><span class="err-msg">Bắt buộc</span></div>
+        <div class="form-group"><label>Loại Phòng</label>
+          <select id="r-type"><option>Phòng họp</option><option>Văn phòng riêng</option><option>Phòng hội thảo</option><option>Không gian làm việc chung</option></select>
+        </div>
+        <div class="form-group"><label>Sức Chứa (người)</label><input id="r-capacity" type="number" placeholder="10"></div>
+        <div class="form-group"><label>Giá / Giờ (VNĐ)</label><input id="r-priceHour" type="number" placeholder="150000"></div>
+        <div class="form-group"><label>Trạng Thái</label>
+          <select id="r-status"><option>Sẵn sàng</option><option>Đang sử dụng</option><option>Bảo trì</option><option>Ngừng cho thuê</option></select>
+        </div>
+        <div class="form-group span2"><label>Nhân Viên Phụ Trách</label><select id="r-staff"></select></div>
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="r-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-room')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveRoom()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="overlay" id="modal-customer">
+  <div class="modal" style="width:min(560px,95vw)">
+    <div class="modal-header">
+      <h3 id="cust-modal-title">Thêm Khách Hàng</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-customer')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Mã KH</label><input id="cu-id" placeholder="KH001"><span class="err-msg">Bắt buộc &amp; không trùng</span></div>
+        <div class="form-group"><label class="required">Tên Khách Hàng</label><input id="cu-name"><span class="err-msg">Bắt buộc</span></div>
+        <div class="form-group"><label>Số Điện Thoại</label><input id="cu-phone" placeholder="0901234567"></div>
+        <div class="form-group"><label>Email</label><input id="cu-email" type="email"></div>
+        <div class="form-group"><label>Số CCCD</label><input id="cu-idcard"></div>
+        <div class="form-group"><label>Công Ty / Đơn Vị</label><input id="cu-company" placeholder="(nếu có)"></div>
+        <div class="form-group span2"><label>Địa Chỉ</label><input id="cu-address"></div>
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="cu-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-customer')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="overlay" id="modal-booking">
+  <div class="modal" style="width:min(640px,95vw)">
+    <div class="modal-header">
+      <h3 id="booking-modal-title">Thêm Đặt Phòng</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-booking')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Phòng</label><select id="b-room" onchange="bookingAutoFill()"></select></div>
+        <div class="form-group"><label class="required">Khách Hàng</label><select id="b-customer"></select></div>
+        <div class="form-group"><label>Ngày Thuê</label><input id="b-date" type="date"></div>
+        <div class="form-group"><label>Nhân Viên Phụ Trách</label><select id="b-staff"></select></div>
+        <div class="form-group"><label>Giờ Bắt Đầu</label><input id="b-start" type="time" onchange="bookingCalc()"></div>
+        <div class="form-group"><label>Giờ Kết Thúc</label><input id="b-end" type="time" onchange="bookingCalc()"></div>
+        <div class="form-group"><label>Đơn Giá / Giờ (VNĐ)</label><input id="b-price" type="number" onchange="bookingCalc()"></div>
+        <div class="form-group"><label>Thành Tiền (VNĐ)</label><input id="b-total" type="number" placeholder="Tự tính, có thể sửa"></div>
+        <div class="form-group"><label>Đã Thanh Toán (VNĐ)</label><input id="b-paid" type="number" placeholder="0"></div>
+        <div class="form-group"><label>Trạng Thái Thanh Toán</label>
+          <select id="b-paystatus"><option>Đã thanh toán</option><option>Còn nợ</option><option>Đã hủy</option></select>
+        </div>
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="b-note" placeholder="Yêu cầu thêm: máy chiếu, nước uống…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-booking')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveBooking()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Service Payment Modal -->
+<div class="overlay" id="modal-servicepay">
+  <div class="modal" style="width:min(680px,95vw)">
+    <div class="modal-header">
+      <h3 id="sp-modal-title">Thêm Hợp Đồng Dịch Vụ</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-servicepay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="required">Số HĐ / Mã Đơn</label><input id="sp-id" placeholder="HD-DV-001"><span class="err-msg">Bắt buộc &amp; không trùng</span></div>
+        <div class="form-group"><label class="required">Khách Hàng</label><select id="sp-customer"></select></div>
+        <div class="form-group"><label class="required">Dịch Vụ</label>
+          <select id="sp-service">
+            <option>Thuê phòng</option><option>Thuê xe</option><option>Phiên dịch</option>
+          </select>
+        </div>
+        <div class="form-group span2" style="flex-direction:row;align-items:flex-end;gap:8px">
+          <input id="sp-service-custom" placeholder="…hoặc nhập dịch vụ mới rồi bấm Thêm" style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addCustomService()">＋ Thêm dịch vụ mới</button>
+        </div>
+        <div class="form-group"><label>Ngày</label><input id="sp-date" type="date"></div>
+        <div class="form-group"><label>Giá Trị Hợp Đồng (VNĐ)</label><input id="sp-total" type="number" placeholder="20000000"></div>
+        <div class="form-group span2"><label>Nhân Viên Phụ Trách</label><select id="sp-staff"></select></div>
+
+        <div class="form-group span2">
+          <label style="margin-bottom:8px">Tiến Độ Thanh Toán</label>
+          <div style="display:flex;flex-direction:column;gap:10px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="checkbox" id="sp-step-quote" style="width:16px;height:16px" onchange="toggleStepDate('quote')">
+              <label style="flex:1;font-size:13px;font-weight:600;color:var(--text);margin:0">1️⃣ Báo giá</label>
+              <input type="date" id="sp-date-quote" style="width:150px">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="checkbox" id="sp-step-request" style="width:16px;height:16px" onchange="toggleStepDate('request')">
+              <label style="flex:1;font-size:13px;font-weight:600;color:var(--text);margin:0">2️⃣ Đề nghị thanh toán</label>
+              <input type="date" id="sp-date-request" style="width:150px">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="checkbox" id="sp-step-acceptance" style="width:16px;height:16px" onchange="toggleStepDate('acceptance')">
+              <label style="flex:1;font-size:13px;font-weight:600;color:var(--text);margin:0">3️⃣ Biên bản nghiệm thu</label>
+              <input type="date" id="sp-date-acceptance" style="width:150px">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="checkbox" id="sp-step-payment" style="width:16px;height:16px" onchange="toggleStepDate('payment')">
+              <label style="flex:1;font-size:13px;font-weight:600;color:var(--text);margin:0">4️⃣ Thanh toán</label>
+              <input type="date" id="sp-date-payment" style="width:150px">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="checkbox" id="sp-step-vat" style="width:16px;height:16px" onchange="toggleStepDate('vat')">
+              <label style="flex:1;font-size:13px;font-weight:600;color:var(--text);margin:0">5️⃣ Hóa đơn VAT</label>
+              <input type="date" id="sp-date-vat" style="width:150px">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group span2"><label>Ghi Chú</label><textarea id="sp-note"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-servicepay')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveServicePay()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// DATA STORE (localStorage)
+// ══════════════════════════════════════════════
+const KEY = 'hrms_data_v2';
+const OLD_KEY = 'hrms_data';
+
+function loadDB() {
+  try {
+    const saved = localStorage.getItem(KEY);
+    if (saved) {
+      const d = JSON.parse(saved);
+      d.contracts = d.contracts || [];
+      d.companyRevenue = d.companyRevenue || [];
+      d.sales = d.sales || [];
+      d.rooms = d.rooms || [];
+      d.customers = d.customers || [];
+      d.bookings = d.bookings || [];
+      d.serviceList = d.serviceList || JSON.parse(JSON.stringify(defaultServiceList));
+      d.servicePay = d.servicePay || [];
+      return d;
+    }
+    // try migrate from old key
+    const old = localStorage.getItem(OLD_KEY);
+    if (old) {
+      const d = JSON.parse(old);
+      d.contracts = []; d.companyRevenue = []; d.sales = [];
+      d.rooms = []; d.customers = []; d.bookings = [];
+      d.serviceList = JSON.parse(JSON.stringify(defaultServiceList));
+      d.servicePay = [];
+      return d;
+    }
+  } catch(e) { console.error('Load DB error', e); }
+  return {
+    employees: JSON.parse(JSON.stringify(defaultEmployees)),
+    tasks: JSON.parse(JSON.stringify(defaultTasks)),
+    tracking: JSON.parse(JSON.stringify(defaultTracking)),
+    contracts: JSON.parse(JSON.stringify(defaultContracts)),
+    companyRevenue: JSON.parse(JSON.stringify(defaultCompanyRevenue)),
+    sales: JSON.parse(JSON.stringify(defaultSales)),
+    rooms: JSON.parse(JSON.stringify(defaultRooms)),
+    customers: JSON.parse(JSON.stringify(defaultCustomers)),
+    bookings: JSON.parse(JSON.stringify(defaultBookings)),
+    serviceList: JSON.parse(JSON.stringify(defaultServiceList)),
+    servicePay: JSON.parse(JSON.stringify(defaultServicePay)),
+  };
+}
+
+function saveDB() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(DB));
+    return true;
+  } catch(e) {
+    console.error('Save DB error', e);
+    toast('❌ Lỗi lưu dữ liệu: ' + e.message, true);
+    return false;
+  }
+}
+
+// ── DEFAULT DATA ──
+const defaultEmployees = [
+  {id:'NV001',name:'Nguyễn Văn An',dept:'Kỹ Thuật',position:'Trưởng Phòng',joindate:'2020-03-15',email:'an.nguyen@company.vn',phone:'0901234567',gender:'Nam',dob:'1985-06-20',address:'12 Lê Lợi, Hà Nội',salary:25000000,status:'Đang làm việc',note:'',
+    idcard:'',idcarddate:'',idcardplace:'',nationality:'Việt Nam',marital:'Đã kết hôn',hometown:'',education:'',taxcode:'',socialid:'',
+    emergencyName:'',emergencyPhone:'',emergencyRelation:'',bankAccount:'',bankName:''},
+  {id:'NV002',name:'Trần Thị Bình',dept:'Kinh Doanh',position:'Nhân Viên',joindate:'2021-07-01',email:'binh.tran@company.vn',phone:'0912345678',gender:'Nữ',dob:'1993-11-05',address:'45 Nguyễn Huệ, HCM',salary:15000000,status:'Đang làm việc',note:'',
+    idcard:'',idcarddate:'',idcardplace:'',nationality:'Việt Nam',marital:'Độc thân',hometown:'',education:'',taxcode:'',socialid:'',
+    emergencyName:'',emergencyPhone:'',emergencyRelation:'',bankAccount:'',bankName:''},
+  {id:'NV003',name:'Lê Minh Cường',dept:'Kế Toán',position:'Kế Toán Trưởng',joindate:'2019-01-10',email:'cuong.le@company.vn',phone:'0923456789',gender:'Nam',dob:'1988-03-25',address:'78 Trần Phú, Đà Nẵng',salary:20000000,status:'Đang làm việc',note:'',
+    idcard:'',idcarddate:'',idcardplace:'',nationality:'Việt Nam',marital:'Đã kết hôn',hometown:'',education:'',taxcode:'',socialid:'',
+    emergencyName:'',emergencyPhone:'',emergencyRelation:'',bankAccount:'',bankName:''},
+  {id:'NV004',name:'Phạm Thị Dung',dept:'Nhân Sự',position:'Chuyên Viên',joindate:'2022-05-20',email:'dung.pham@company.vn',phone:'0934567890',gender:'Nữ',dob:'1995-09-14',address:'34 Hai Bà Trưng, Hà Nội',salary:14000000,status:'Đang làm việc',note:'',
+    idcard:'',idcarddate:'',idcardplace:'',nationality:'Việt Nam',marital:'Độc thân',hometown:'',education:'',taxcode:'',socialid:'',
+    emergencyName:'',emergencyPhone:'',emergencyRelation:'',bankAccount:'',bankName:''},
+  {id:'NV005',name:'Hoàng Văn Em',dept:'Marketing',position:'Nhân Viên',joindate:'2023-02-01',email:'em.hoang@company.vn',phone:'0945678901',gender:'Nam',dob:'1997-12-30',address:'56 Đinh Tiên Hoàng, HCM',salary:13000000,status:'Thử việc',note:'3 tháng thử việc',
+    idcard:'',idcarddate:'',idcardplace:'',nationality:'Việt Nam',marital:'Độc thân',hometown:'',education:'',taxcode:'',socialid:'',
+    emergencyName:'',emergencyPhone:'',emergencyRelation:'',bankAccount:'',bankName:''},
+];
+const defaultTasks = [
+  {id:'CV001',name:'Thiết kế giao diện website',desc:'Thiết kế UI/UX cho trang chủ',project:'Dự Án Web 2024',priority:'Cao',status:'Đang thực hiện',start:'2024-01-10',deadline:'2024-12-15',creator:'NV001',tag:'Design',note:''},
+  {id:'CV002',name:'Báo cáo tài chính Q1',desc:'Tổng hợp báo cáo quý 1',project:'Kế Toán',priority:'Cao',status:'Hoàn thành',start:'2024-01-01',deadline:'2024-03-31',creator:'NV003',tag:'Finance',note:''},
+  {id:'CV003',name:'Tuyển dụng 5 nhân viên',desc:'Đăng tin, phỏng vấn, onboard',project:'HR 2024',priority:'Trung bình',status:'Đang thực hiện',start:'2024-01-15',deadline:'2024-12-01',creator:'NV004',tag:'HR',note:''},
+  {id:'CV004',name:'Chiến dịch marketing Q2',desc:'Lên kế hoạch & triển khai',project:'Marketing',priority:'Trung bình',status:'Chưa bắt đầu',start:'2024-04-01',deadline:'2024-12-31',creator:'NV005',tag:'Marketing',note:''},
+  {id:'CV005',name:'Nâng cấp hệ thống server',desc:'Nâng cấp RAM và SSD',project:'IT Infra',priority:'Thấp',status:'Đang thực hiện',start:'2024-01-20',deadline:'2024-09-28',creator:'NV001',tag:'IT',note:''},
+];
+const defaultTracking = [
+  {id:1,taskId:'CV001',empId:'NV002',assigndate:'2024-01-10',deadline:'2024-12-15',progress:75,status:'Đang thực hiện',donedate:'',rating:'4',note:'Đang hoàn thiện màn hình chi tiết'},
+  {id:2,taskId:'CV001',empId:'NV001',assigndate:'2024-01-10',deadline:'2024-12-15',progress:80,status:'Đang thực hiện',donedate:'',rating:'5',note:'Review & góp ý thiết kế'},
+  {id:3,taskId:'CV002',empId:'NV003',assigndate:'2024-01-01',deadline:'2024-03-31',progress:100,status:'Hoàn thành',donedate:'2024-01-30',rating:'5',note:'Nộp đúng hạn'},
+  {id:4,taskId:'CV003',empId:'NV004',assigndate:'2024-01-15',deadline:'2024-12-01',progress:40,status:'Đang thực hiện',donedate:'',rating:'3',note:'Đã phỏng vấn 3/5 vị trí'},
+  {id:5,taskId:'CV004',empId:'NV005',assigndate:'2024-04-01',deadline:'2024-12-31',progress:10,status:'Chưa bắt đầu',donedate:'',rating:'3',note:'Chờ duyệt ngân sách'},
+  {id:6,taskId:'CV005',empId:'NV001',assigndate:'2024-01-20',deadline:'2024-09-28',progress:60,status:'Đang thực hiện',donedate:'',rating:'4',note:'Đã nâng cấp 3/5 server'},
+];
+const defaultContracts = [
+  {id:'HD2020-001',empId:'NV001',type:'Không xác định thời hạn',start:'2020-03-15',end:'',salary:25000000,allowance:2000000,signer:'Giám đốc Trần Văn Hùng',signdate:'2020-03-10',status:'Còn hiệu lực',note:'',fileName:'',fileData:''},
+  {id:'HD2021-014',empId:'NV002',type:'Xác định thời hạn',start:'2021-07-01',end:'2026-07-01',salary:15000000,allowance:500000,signer:'Giám đốc Trần Văn Hùng',signdate:'2021-06-25',status:'Còn hiệu lực',note:'',fileName:'',fileData:''},
+  {id:'HD2024-022',empId:'NV005',type:'Thử việc',start:'2024-02-01',end:'2024-05-01',salary:13000000,allowance:0,signer:'Trưởng phòng Nhân Sự',signdate:'2024-01-28',status:'Đã hết hạn',note:'Đã chuyển sang HĐ chính thức',fileName:'',fileData:''},
+];
+const defaultCompanyRevenue = [
+  {month:'2026-01',revenue:480000000,cost:320000000,note:''},
+  {month:'2026-02',revenue:510000000,cost:330000000,note:''},
+  {month:'2026-03',revenue:560000000,cost:340000000,note:'Ra mắt sản phẩm mới'},
+  {month:'2026-04',revenue:540000000,cost:350000000,note:''},
+  {month:'2026-05',revenue:600000000,cost:360000000,note:''},
+  {month:'2026-06',revenue:620000000,cost:365000000,note:''},
+];
+const defaultSales = [
+  {id:1,empId:'NV002',month:'2026-05',revenue:85000000,target:100000000,commission:4250000,note:''},
+  {id:2,empId:'NV002',month:'2026-06',revenue:110000000,target:100000000,commission:6600000,note:'Vượt chỉ tiêu'},
+  {id:3,empId:'NV005',month:'2026-05',revenue:40000000,target:60000000,commission:1600000,note:''},
+  {id:4,empId:'NV005',month:'2026-06',revenue:55000000,target:60000000,commission:2200000,note:''},
+];
+
+const defaultRooms = [
+  {id:'P001',name:'Phòng họp Lotus',type:'Phòng họp',capacity:10,priceHour:150000,status:'Sẵn sàng',staffId:'NV004',note:'Có máy chiếu, bảng trắng'},
+  {id:'P002',name:'Phòng họp Sen',type:'Phòng họp',capacity:6,priceHour:100000,status:'Sẵn sàng',staffId:'NV004',note:''},
+  {id:'P003',name:'Văn phòng riêng A1',type:'Văn phòng riêng',capacity:4,priceHour:80000,status:'Đang sử dụng',staffId:'NV002',note:''},
+  {id:'P004',name:'Phòng hội thảo Mai',type:'Phòng hội thảo',capacity:30,priceHour:400000,status:'Sẵn sàng',staffId:'NV001',note:'Sức chứa lớn, có âm thanh'},
+];
+const defaultCustomers = [
+  {id:'KH001',name:'Công ty TNHH ABC',phone:'0911222333',email:'contact@abc.vn',idcard:'',company:'ABC Co., Ltd',address:'Số 5 Trần Duy Hưng, Hà Nội',note:''},
+  {id:'KH002',name:'Nguyễn Thị Hoa',phone:'0933444555',email:'hoa.nguyen@gmail.com',idcard:'001199002233',company:'',address:'',note:'Khách quen, thuê hàng tuần'},
+  {id:'KH003',name:'Startup XYZ',phone:'0977888999',email:'hello@xyz.io',idcard:'',company:'XYZ Innovations',address:'',note:''},
+];
+const defaultBookings = [
+  {id:1,roomId:'P001',custId:'KH001',date:'2026-06-10',start:'09:00',end:'11:00',hours:2,price:150000,total:300000,paid:300000,staffId:'NV004',status:'Đã thanh toán',note:'Họp khách hàng quý 2'},
+  {id:2,roomId:'P003',custId:'KH003',date:'2026-06-12',start:'08:00',end:'17:00',hours:9,price:80000,total:720000,paid:400000,staffId:'NV002',status:'Còn nợ',note:'Thuê cả ngày làm việc'},
+  {id:3,roomId:'P004',custId:'KH001',date:'2026-06-15',start:'13:00',end:'16:00',hours:3,price:400000,total:1200000,paid:1200000,staffId:'NV001',status:'Đã thanh toán',note:'Hội thảo ra mắt sản phẩm'},
+  {id:4,roomId:'P002',custId:'KH002',date:'2026-06-18',start:'14:00',end:'15:30',hours:1.5,price:100000,total:150000,paid:150000,staffId:'NV004',status:'Đã thanh toán',note:''},
+  {id:5,roomId:'P001',custId:'KH002',date:'2026-06-22',start:'10:00',end:'12:00',hours:2,price:150000,total:300000,paid:0,staffId:'NV004',status:'Còn nợ',note:'Hẹn thanh toán cuối tháng'},
+];
+
+const defaultServiceList = ['Thuê phòng','Thuê xe','Phiên dịch'];
+
+const SP_STEPS = [
+  {key:'quote',      label:'Báo giá'},
+  {key:'request',    label:'Đề nghị thanh toán'},
+  {key:'acceptance', label:'Biên bản nghiệm thu'},
+  {key:'payment',    label:'Thanh toán'},
+  {key:'vat',        label:'Hóa đơn VAT'},
+];
+
+const defaultServicePay = [
+  {id:'HD-DV-001',custId:'KH001',service:'Thuê xe',date:'2026-06-05',total:8000000,staffId:'NV002',note:'Thuê xe 16 chỗ đưa khách tham quan',
+    steps:{quote:'2026-06-05',request:'2026-06-07',acceptance:'2026-06-10',payment:'2026-06-12',vat:''}},
+  {id:'HD-DV-002',custId:'KH003',service:'Phiên dịch',date:'2026-06-08',total:5000000,staffId:'NV005',note:'Phiên dịch hội thảo song ngữ Anh-Việt',
+    steps:{quote:'2026-06-08',request:'2026-06-09',acceptance:'',payment:'',vat:''}},
+  {id:'HD-DV-003',custId:'KH002',service:'Thuê phòng',date:'2026-06-15',total:1200000,staffId:'NV004',note:'Liên kết HĐ phòng hội thảo Mai',
+    steps:{quote:'2026-06-14',request:'2026-06-15',acceptance:'2026-06-15',payment:'2026-06-16',vat:'2026-06-18'}},
+];
+
+// Now that default data exists, load (or initialize) the database
+let DB = loadDB();
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+const titles = { dashboard:'Dashboard', employees:'Quản Lý Nhân Viên', tasks:'Quản Lý Công Việc', tracking:'Theo Dõi Công Việc', contracts:'Hợp Đồng Làm Việc', revenue:'Doanh Thu', rooms:'Phòng & Khách Hàng', bookings:'Đặt Phòng & Doanh Thu', servicepay:'HĐ Dịch Vụ & Thanh Toán' };
+const addLabels = { dashboard:'', employees:'＋ Thêm nhân viên', tasks:'＋ Thêm công việc', tracking:'＋ Giao công việc', contracts:'＋ Thêm hợp đồng', revenue:'', rooms:'＋ Thêm phòng', bookings:'＋ Thêm đặt phòng', servicepay:'＋ Thêm hợp đồng dịch vụ' };
+let currentPage = 'dashboard';
+
+function show(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active', a.dataset.page===page));
+  document.getElementById('page-title').textContent = titles[page];
+  currentPage = page;
+  document.getElementById('add-btn').textContent = addLabels[page] || '';
+  document.getElementById('add-btn').style.display = (page==='dashboard'||page==='revenue'||page==='rooms') ? 'none' : '';
+  renderPage(page);
+}
+
+function openAdd() {
+  if(currentPage==='employees') openEmployeeModal();
+  else if(currentPage==='tasks') openTaskModal();
+  else if(currentPage==='tracking') openTrackingModal();
+  else if(currentPage==='contracts') openContractModal();
+  else if(currentPage==='bookings') openBookingModal();
+  else if(currentPage==='servicepay') openServicePayModal();
+}
+
+function switchTab(el, tabId) {
+  const tabsRow = el.parentElement;
+  tabsRow.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const modal = el.closest('.modal');
+  modal.querySelectorAll('.mtab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function fmt(date) { if(!date) return '—'; const d=new Date(date); if(isNaN(d)) return '—'; return d.toLocaleDateString('vi-VN'); }
+function fmtMonth(m) { if(!m) return '—'; const [y,mo]=m.split('-'); return `Tháng ${mo}/${y}`; }
+function fmtMoney(n) { if(n===''||n===null||n===undefined||isNaN(n)) return '—'; return Number(n).toLocaleString('vi-VN')+'đ'; }
+function initials(name) { return (name||'?').split(' ').filter(Boolean).slice(-2).map(w=>w[0]).join('').toUpperCase(); }
+function toast(msg, isErr=false) {
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function daysLeft(deadline) {
+  if(!deadline) return null;
+  const d = new Date(deadline); if(isNaN(d)) return null;
+  return Math.ceil((d-new Date())/86400000);
+}
+function dlClass(days, status) {
+  if(status==='Hoàn thành') return 'on-track';
+  if(days===null) return '';
+  if(days < 0) return 'overdue';
+  if(days <= 3) return 'urgent';
+  return 'on-track';
+}
+function dlText(days, status) {
+  if(status==='Hoàn thành') return '<span class="badge badge-green">✅ Xong</span>';
+  if(days===null) return '—';
+  if(days < 0) return `<span class="overdue">⛔ Quá ${Math.abs(days)} ngày</span>`;
+  if(days === 0) return `<span class="urgent">🔥 Hôm nay</span>`;
+  if(days <= 3) return `<span class="urgent">⚠️ Còn ${days} ngày</span>`;
+  return `<span class="on-track">✅ Còn ${days} ngày</span>`;
+}
+function statusBadge(s) {
+  const map = {
+    'Đang làm việc':'badge-green','Đang thực hiện':'badge-blue',
+    'Hoàn thành':'badge-green','Thử việc':'badge-amber',
+    'Nghỉ phép':'badge-purple','Nghỉ việc':'badge-red',
+    'Chưa bắt đầu':'badge-gray','Tạm dừng':'badge-amber','Hủy bỏ':'badge-red',
+    'Còn hiệu lực':'badge-green','Sắp hết hạn':'badge-amber','Đã hết hạn':'badge-gray','Đã chấm dứt':'badge-red'
+  };
+  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+function priorityBadge(p) {
+  const map = {'Cao':'badge-red','Trung bình':'badge-amber','Thấp':'badge-green'};
+  return `<span class="badge ${map[p]||'badge-gray'}">${p}</span>`;
+}
+function progressBar(pct) {
+  const p = Math.max(0,Math.min(100,Number(pct)||0));
+  const col = p>=80?'#10b981':p>=40?'#f59e0b':'#ef4444';
+  return `<div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:${col}"></div></div><span class="progress-label" style="color:${col}">${p}%</span></div>`;
+}
+function stars(r) {
+  if(!r) return '—';
+  return '★'.repeat(Number(r))+'☆'.repeat(5-Number(r));
+}
+function empName(id) { const e=DB.employees.find(e=>e.id===id); return e?e.name:(id||'—'); }
+function taskName(id) { const t=DB.tasks.find(t=>t.id===id); return t?t.name:(id||'—'); }
+function roomName(id) { const r=DB.rooms.find(r=>r.id===id); return r?r.name:(id||'—'); }
+function custName(id) { const c=DB.customers.find(c=>c.id===id); return c?c.name:(id||'—'); }
+
+// Generic comparator: 'field-asc' / 'field-desc' style sort
+function cmpStr(a,b) { return (a||'').toString().localeCompare((b||'').toString(), 'vi'); }
+function cmpNum(a,b) { return (Number(a)||0) - (Number(b)||0); }
+function cmpDate(a,b) {
+  // empty dates sort last for asc, first for desc handled by caller direction
+  if(!a && !b) return 0;
+  if(!a) return 1;
+  if(!b) return -1;
+  return new Date(a) - new Date(b);
+}
+function inDateRange(dateStr, from, to) {
+  if(!dateStr) return !from && !to;
+  if(from && dateStr < from) return false;
+  if(to && dateStr > to) return false;
+  return true;
+}
+function clearFieldErrors(modalId) {
+  document.querySelectorAll('#'+modalId+' .field-error').forEach(el=>el.classList.remove('field-error'));
+  document.querySelectorAll('#'+modalId+' .err-msg').forEach(el=>el.style.display='none');
+}
+function markFieldError(inputId) {
+  const el = document.getElementById(inputId);
+  if(!el) return;
+  el.classList.add('field-error');
+  const msg = el.parentElement.querySelector('.err-msg');
+  if(msg) msg.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════
+// RENDER ROUTER
+// ══════════════════════════════════════════════
+function renderPage(page) {
+  if(page==='dashboard') renderDashboard();
+  else if(page==='employees') renderEmployees();
+  else if(page==='tasks') renderTasks();
+  else if(page==='tracking') renderTracking();
+  else if(page==='contracts') renderContracts();
+  else if(page==='revenue') renderRevenuePage();
+  else if(page==='rooms') renderRoomsPage();
+  else if(page==='bookings') renderBookingsPage();
+  else if(page==='servicepay') renderServicePay();
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const emp = DB.employees, tasks = DB.tasks, tr = DB.tracking, contracts = DB.contracts, compRev = DB.companyRevenue, sales = DB.sales;
+  const bookings = DB.bookings.filter(b=>b.status!=='Đã hủy');
+  const active = emp.filter(e=>e.status==='Đang làm việc').length;
+  const done = tr.filter(t=>t.status==='Hoàn thành').length;
+  const inprog = tr.filter(t=>t.status==='Đang thực hiện').length;
+  const overdue = tr.filter(t=>t.status!=='Hoàn thành'&&daysLeft(t.deadline)<0).length;
+  const lastRev = compRev.slice().sort((a,b)=>a.month.localeCompare(b.month)).slice(-1)[0];
+  const roomRevenue = bookings.reduce((a,b)=>a+(Number(b.total)||0),0);
+  const roomDebt = bookings.reduce((a,b)=>a+Math.max((Number(b.total)||0)-(Number(b.paid)||0),0),0);
+
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card" style="--accent:var(--blue)"><div class="kpi-label">👥 Tổng nhân viên</div><div class="kpi-value">${emp.length}</div><div class="kpi-sub">${active} đang làm việc</div></div>
+    <div class="kpi-card" style="--accent:var(--green)"><div class="kpi-label">📋 Tổng công việc</div><div class="kpi-value">${tasks.length}</div><div class="kpi-sub">${done} hoàn thành</div></div>
+    <div class="kpi-card" style="--accent:var(--cyan)"><div class="kpi-label">🔄 Đang thực hiện</div><div class="kpi-value">${inprog}</div><div class="kpi-sub">mục đang chạy</div></div>
+    <div class="kpi-card" style="--accent:var(--red)"><div class="kpi-label">⛔ Quá hạn</div><div class="kpi-value">${overdue}</div><div class="kpi-sub">cần xử lý ngay</div></div>
+    <div class="kpi-card" style="--accent:var(--purple)"><div class="kpi-label">🏠 DT thuê phòng</div><div class="kpi-value" style="font-size:22px">${fmtMoney(roomRevenue)}</div><div class="kpi-sub">${roomDebt>0?'⚠️ Nợ: '+fmtMoney(roomDebt):'Không có công nợ'}</div></div>
+    <div class="kpi-card" style="--accent:var(--purple)"><div class="kpi-label">📄 Hợp đồng</div><div class="kpi-value">${contracts.length}</div><div class="kpi-sub">${contracts.filter(c=>c.status==='Còn hiệu lực').length} còn hiệu lực</div></div>
+    <div class="kpi-card" style="--accent:var(--amber)"><div class="kpi-label">💰 DT tháng gần nhất</div><div class="kpi-value" style="font-size:22px">${lastRev?fmtMoney(lastRev.revenue):'—'}</div><div class="kpi-sub">${lastRev?fmtMonth(lastRev.month):''}</div></div>
+  `;
+
+  const colors = ['#2563eb','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
+  const nvChart = document.getElementById('nv-chart');
+  nvChart.innerHTML = emp.map((e,i) => {
+    const myTr = tr.filter(t=>t.empId===e.id);
+    const myDone = myTr.filter(t=>t.status==='Hoàn thành').length;
+    const pct = myTr.length ? Math.round(myDone/myTr.length*100) : 0;
+    return `<div class="chart-row"><div class="lbl">${e.name.split(' ').slice(-2).join(' ')}</div><div class="bar-out"><div class="bar-in" style="width:${pct}%;background:${colors[i%colors.length]}"></div></div><div class="val">${pct}%</div></div>`;
+  }).join('') || '<div class="empty"><p>Chưa có dữ liệu</p></div>';
+
+  const soon = tr.filter(t=>t.status!=='Hoàn thành').map(t=>({...t,days:daysLeft(t.deadline)})).filter(t=>t.days!==null&&t.days<=7).sort((a,b)=>a.days-b.days).slice(0,6);
+  document.getElementById('deadline-list').innerHTML = soon.length ? soon.map(t=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span class="dl-dot" style="background:${t.days<0?'#ef4444':t.days<=3?'#f59e0b':'#10b981'}"></span>
+      <div style="flex:1"><div style="font-weight:600;font-size:13px">${taskName(t.taskId)}</div><div style="font-size:12px;color:var(--muted)">${empName(t.empId)}</div></div>
+      ${dlText(t.days, t.status)}
+    </div>`).join('') : '<div class="empty"><div class="ei">🎉</div><p>Không có công việc sắp đến hạn</p></div>';
+
+  const deptMap = {};
+  emp.forEach(e=>{ deptMap[e.dept]=(deptMap[e.dept]||0)+1; });
+  const maxD = Math.max(...Object.values(deptMap),1);
+  document.getElementById('dept-chart').innerHTML = Object.entries(deptMap).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>
+    `<div class="chart-row"><div class="lbl">${k}</div><div class="bar-out"><div class="bar-in" style="width:${v/maxD*100}%;background:${colors[i%colors.length]}"></div></div><div class="val">${v}</div></div>`
+  ).join('') || '<div class="empty"><p>Chưa có nhân viên</p></div>';
+
+  // Revenue chart - last 6 months
+  const sortedRev = compRev.slice().sort((a,b)=>a.month.localeCompare(b.month)).slice(-6);
+  const maxRev = Math.max(...sortedRev.map(r=>r.revenue||0),1);
+  document.getElementById('revenue-chart').innerHTML = sortedRev.length ? sortedRev.map(r=>
+    `<div class="chart-row"><div class="lbl">${fmtMonth(r.month)}</div><div class="bar-out"><div class="bar-in" style="width:${(r.revenue||0)/maxRev*100}%;background:#10b981"></div></div><div class="val">${fmtMoney(r.revenue)}</div></div>`
+  ).join('') : '<div class="empty"><p>Chưa có dữ liệu doanh thu</p></div>';
+
+  // Contract alerts: hết hạn trong 60 ngày
+  const contractSoon = contracts.map(c=>({...c,days:daysLeft(c.end)})).filter(c=>c.end && c.status!=='Đã chấm dứt' && c.days!==null && c.days<=60).sort((a,b)=>a.days-b.days).slice(0,6);
+  document.getElementById('contract-alert-list').innerHTML = contractSoon.length ? contractSoon.map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span class="dl-dot" style="background:${c.days<0?'#ef4444':c.days<=15?'#f59e0b':'#10b981'}"></span>
+      <div style="flex:1"><div style="font-weight:600;font-size:13px">${empName(c.empId)}</div><div style="font-size:12px;color:var(--muted)">${c.id} · ${c.type}</div></div>
+      <span style="font-size:12px;font-weight:600;color:${c.days<0?'#dc2626':c.days<=15?'#d97706':'#16a34a'}">${c.days<0?'Quá '+Math.abs(c.days)+'ng':'Còn '+c.days+'ng'}</span>
+    </div>`).join('') : '<div class="empty"><div class="ei">📄</div><p>Không có hợp đồng sắp hết hạn</p></div>';
+
+  // Top sales last month
+  const lastMonth = sales.length ? sales.slice().sort((a,b)=>a.month.localeCompare(b.month)).slice(-1)[0].month : null;
+  const topSales = lastMonth ? sales.filter(s=>s.month===lastMonth).sort((a,b)=>(b.revenue||0)-(a.revenue||0)) : [];
+  const maxSale = Math.max(...topSales.map(s=>s.revenue||0),1);
+  document.getElementById('top-sales-chart').innerHTML = topSales.length ? topSales.map((s,i)=>
+    `<div class="chart-row"><div class="lbl">${empName(s.empId)}</div><div class="bar-out"><div class="bar-in" style="width:${(s.revenue||0)/maxSale*100}%;background:${colors[i%colors.length]}"></div></div><div class="val">${fmtMoney(s.revenue)}</div></div>`
+  ).join('') : '<div class="empty"><p>Chưa có dữ liệu doanh thu nhân viên</p></div>';
+}
+
+// ── EMPLOYEES ──
+function renderEmployees() {
+  const search = document.getElementById('emp-search').value.toLowerCase();
+  const dept   = document.getElementById('emp-filter-dept').value;
+  const status = document.getElementById('emp-filter-status').value;
+  const sortVal = document.getElementById('emp-sort').value;
+
+  const depts = [...new Set(DB.employees.map(e=>e.dept))].sort();
+  const deptSel = document.getElementById('emp-filter-dept');
+  const cur = deptSel.value;
+  deptSel.innerHTML = '<option value="">Tất cả phòng ban</option>' + depts.map(d=>`<option ${d===cur?'selected':''}>${d}</option>`).join('');
+
+  let list = DB.employees.filter(e => {
+    const q = `${e.id} ${e.name} ${e.dept} ${e.position} ${e.email}`.toLowerCase();
+    return (!search||q.includes(search)) && (!dept||e.dept===dept) && (!status||e.status===status);
+  });
+
+  list = list.slice().sort((a,b) => {
+    switch(sortVal) {
+      case 'name-desc':   return cmpStr(b.name, a.name);
+      case 'join-desc':   return cmpDate(b.joindate, a.joindate) || cmpStr(a.name,b.name);
+      case 'join-asc':    return cmpDate(a.joindate, b.joindate) || cmpStr(a.name,b.name);
+      case 'salary-desc': return cmpNum(b.salary, a.salary) || cmpStr(a.name,b.name);
+      case 'salary-asc':  return cmpNum(a.salary, b.salary) || cmpStr(a.name,b.name);
+      case 'name-asc':
+      default:            return cmpStr(a.name, b.name);
+    }
+  });
+
+  const tbody = document.getElementById('emp-tbody');
+  tbody.innerHTML = list.length ? list.map(e=>`
+    <tr>
+      <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">${e.id}</code></td>
+      <td><div class="name-cell"><div class="avatar">${initials(e.name)}</div><div><div style="font-weight:600">${e.name}</div><div style="font-size:11px;color:var(--muted)">${e.gender||''}</div></div></div></td>
+      <td><span class="tag">${e.dept}</span></td>
+      <td>${e.position||'—'}</td>
+      <td>${fmt(e.joindate)}</td>
+      <td style="color:var(--blue)">${e.email||'—'}</td>
+      <td>${e.phone||'—'}</td>
+      <td style="font-weight:600">${fmtMoney(e.salary)}</td>
+      <td>${statusBadge(e.status)}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openEmployeeModal('${e.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">🗑</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="10"><div class="empty"><div class="ei">👤</div><p>Không tìm thấy nhân viên</p></div></td></tr>';
+}
+
+// ── TASKS ──
+function renderTasks() {
+  const search   = document.getElementById('task-search').value.toLowerCase();
+  const priority = document.getElementById('task-filter-priority').value;
+  const status   = document.getElementById('task-filter-status').value;
+  const sortVal  = document.getElementById('task-sort').value;
+
+  let list = DB.tasks.filter(t => {
+    const q = `${t.id} ${t.name} ${t.project} ${t.tag}`.toLowerCase();
+    return (!search||q.includes(search)) && (!priority||t.priority===priority) && (!status||t.status===status);
+  });
+
+  list = list.slice().sort((a,b) => {
+    switch(sortVal) {
+      case 'name-desc':     return cmpStr(b.name, a.name);
+      case 'deadline-desc': return cmpDate(b.deadline, a.deadline);
+      case 'start-desc':    return cmpDate(b.start, a.start);
+      case 'start-asc':     return cmpDate(a.start, b.start);
+      case 'deadline-asc':
+      default:              return cmpDate(a.deadline, b.deadline);
+    }
+  });
+
+  const tbody = document.getElementById('task-tbody');
+  tbody.innerHTML = list.length ? list.map(t=>{
+    const days = daysLeft(t.deadline);
+    return `<tr>
+      <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">${t.id}</code></td>
+      <td><div style="font-weight:600">${t.name}</div>${t.desc?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${t.desc.slice(0,60)}</div>`:''}</td>
+      <td>${t.project?`<span class="tag">${t.project}</span>`:'—'}</td>
+      <td>${priorityBadge(t.priority)}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td>${fmt(t.start)}</td>
+      <td><span class="${dlClass(days,t.status)}">${fmt(t.deadline)}</span></td>
+      <td>${empName(t.creator)}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openTaskModal('${t.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}')">🗑</button>
+      </div></td>
+    </tr>`;}).join('') : '<tr><td colspan="9"><div class="empty"><div class="ei">📋</div><p>Không tìm thấy công việc</p></div></td></tr>';
+}
+
+// ── TRACKING ──
+function renderTracking() {
+  const search = document.getElementById('track-search').value.toLowerCase();
+  const empId  = document.getElementById('track-filter-nv').value;
+  const status = document.getElementById('track-filter-status').value;
+  const sortVal = document.getElementById('track-sort').value;
+
+  const nvSel = document.getElementById('track-filter-nv');
+  const cur = nvSel.value;
+  const nvIds = [...new Set(DB.tracking.map(t=>t.empId))];
+  nvSel.innerHTML = '<option value="">Tất cả nhân viên</option>' + nvIds.map(id=>`<option value="${id}" ${id===cur?'selected':''}>${empName(id)}</option>`).join('');
+
+  let list = DB.tracking.filter(t => {
+    const q = `${taskName(t.taskId)} ${empName(t.empId)}`.toLowerCase();
+    return (!search||q.includes(search)) && (!empId||t.empId===empId) && (!status||t.status===status);
+  });
+
+  list = list.slice().sort((a,b) => {
+    switch(sortVal) {
+      case 'deadline-desc': return cmpDate(b.deadline, a.deadline);
+      case 'progress-desc': return cmpNum(b.progress, a.progress);
+      case 'progress-asc':  return cmpNum(a.progress, b.progress);
+      case 'name-asc':       return cmpStr(taskName(a.taskId), taskName(b.taskId));
+      case 'deadline-asc':
+      default:               return cmpDate(a.deadline, b.deadline);
+    }
+  });
+
+  const tbody = document.getElementById('track-tbody');
+  tbody.innerHTML = list.length ? list.map(t=>{
+    const days = daysLeft(t.deadline);
+    return `<tr>
+      <td><div style="font-weight:600">${taskName(t.taskId)}</div><div style="font-size:11px;color:var(--muted)">${t.note||''}</div></td>
+      <td><div class="name-cell"><div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(empName(t.empId))}</div><span style="font-weight:500">${empName(t.empId)}</span></div></td>
+      <td>${fmt(t.assigndate)}</td>
+      <td><span class="${dlClass(days,t.status)}">${fmt(t.deadline)}</span></td>
+      <td>${progressBar(t.progress)}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td>${dlText(days, t.status)}</td>
+      <td style="color:var(--amber);font-size:14px">${stars(t.rating)}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openTrackingModal(${t.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTracking(${t.id})">🗑</button>
+      </div></td>
+    </tr>`;}).join('') : '<tr><td colspan="9"><div class="empty"><div class="ei">📊</div><p>Không tìm thấy dữ liệu</p></div></td></tr>';
+}
+
+// ── CONTRACTS ──
+function computeContractStatus(c) {
+  if(c.status === 'Đã chấm dứt') return 'Đã chấm dứt';
+  if(!c.end) return 'Còn hiệu lực';
+  const d = daysLeft(c.end);
+  if(d === null) return c.status || 'Còn hiệu lực';
+  if(d < 0) return 'Đã hết hạn';
+  if(d <= 30) return 'Sắp hết hạn';
+  return 'Còn hiệu lực';
+}
+
+function renderContracts() {
+  const search = document.getElementById('contract-search').value.toLowerCase();
+  const type   = document.getElementById('contract-filter-type').value;
+  const status = document.getElementById('contract-filter-status').value;
+  const sortVal = document.getElementById('contract-sort').value;
+
+  let list = DB.contracts.map(c => ({...c, computedStatus: computeContractStatus(c)}));
+  list = list.filter(c => {
+    const q = `${c.id} ${empName(c.empId)} ${c.type}`.toLowerCase();
+    return (!search||q.includes(search)) && (!type||c.type===type) && (!status||c.computedStatus===status);
+  });
+
+  list = list.sort((a,b) => {
+    switch(sortVal) {
+      case 'end-desc':   return cmpDate(b.end, a.end);
+      case 'start-desc': return cmpDate(b.start, a.start);
+      case 'start-asc':  return cmpDate(a.start, b.start);
+      case 'name-asc':   return cmpStr(empName(a.empId), empName(b.empId));
+      case 'end-asc':
+      default:           return cmpDate(a.end, b.end);
+    }
+  });
+
+  const tbody = document.getElementById('contract-tbody');
+  tbody.innerHTML = list.length ? list.map(c=>`
+    <tr>
+      <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">${c.id}</code></td>
+      <td><div class="name-cell"><div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(empName(c.empId))}</div><span style="font-weight:500">${empName(c.empId)}</span></div></td>
+      <td><span class="tag">${c.type}</span></td>
+      <td>${fmt(c.start)}</td>
+      <td>${c.end?fmt(c.end):'Vô thời hạn'}</td>
+      <td style="font-weight:600">${fmtMoney(c.salary)}</td>
+      <td>${c.signer||'—'}</td>
+      <td>${c.fileName ? `<span class="file-chip">📎 ${c.fileName.length>16?c.fileName.slice(0,16)+'…':c.fileName}</span>` : '—'}</td>
+      <td>${statusBadge(c.computedStatus)}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openContractModal('${c.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteContract('${c.id}')">🗑</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="10"><div class="empty"><div class="ei">📄</div><p>Chưa có hợp đồng nào</p></div></td></tr>';
+}
+
+// ── REVENUE PAGE ──
+function renderRevenuePage() {
+  renderCompanyRevenue();
+  renderSales();
+  renderRevenueKpi();
+}
+
+function renderRevenueKpi() {
+  const cr = DB.companyRevenue, s = DB.sales;
+  const sortedCr = cr.slice().sort((a,b)=>a.month.localeCompare(b.month));
+  const last = sortedCr.slice(-1)[0];
+  const prev = sortedCr.slice(-2,-1)[0];
+  const totalRevYTD = cr.reduce((a,b)=>a+(Number(b.revenue)||0),0);
+  const totalProfit = cr.reduce((a,b)=>a+((Number(b.revenue)||0)-(Number(b.cost)||0)),0);
+  let growth = null;
+  if(last && prev && prev.revenue) growth = ((last.revenue-prev.revenue)/prev.revenue*100);
+  const totalSalesRev = s.reduce((a,b)=>a+(Number(b.revenue)||0),0);
+
+  document.getElementById('revenue-kpi').innerHTML = `
+    <div class="kpi-card" style="--accent:var(--green)"><div class="kpi-label">💰 DT tháng gần nhất</div><div class="kpi-value" style="font-size:22px">${last?fmtMoney(last.revenue):'—'}</div><div class="kpi-sub">${last?fmtMonth(last.month):''}</div></div>
+    <div class="kpi-card" style="--accent:${growth>=0?'var(--green)':'var(--red)'}"><div class="kpi-label">📈 Tăng trưởng MoM</div><div class="kpi-value" style="font-size:22px">${growth===null?'—':(growth>=0?'+':'')+growth.toFixed(1)+'%'}</div><div class="kpi-sub">so với tháng trước</div></div>
+    <div class="kpi-card" style="--accent:var(--blue)"><div class="kpi-label">🏦 Tổng DT đã ghi nhận</div><div class="kpi-value" style="font-size:22px">${fmtMoney(totalRevYTD)}</div><div class="kpi-sub">${cr.length} tháng dữ liệu</div></div>
+    <div class="kpi-card" style="--accent:var(--purple)"><div class="kpi-label">💵 Tổng lợi nhuận</div><div class="kpi-value" style="font-size:22px">${fmtMoney(totalProfit)}</div><div class="kpi-sub">doanh thu - chi phí</div></div>
+    <div class="kpi-card" style="--accent:var(--amber)"><div class="kpi-label">👤 Tổng DT nhân viên</div><div class="kpi-value" style="font-size:22px">${fmtMoney(totalSalesRev)}</div><div class="kpi-sub">${s.length} bản ghi</div></div>
+  `;
+}
+
+function renderCompanyRevenue() {
+  const list = DB.companyRevenue.slice().sort((a,b)=>b.month.localeCompare(a.month));
+  const tbody = document.getElementById('comp-rev-tbody');
+  tbody.innerHTML = list.length ? list.map(r=>{
+    const profit = (Number(r.revenue)||0)-(Number(r.cost)||0);
+    return `<tr>
+      <td style="font-weight:600">${fmtMonth(r.month)}</td>
+      <td style="color:#16a34a;font-weight:600">${fmtMoney(r.revenue)}</td>
+      <td style="color:#dc2626">${fmtMoney(r.cost)}</td>
+      <td style="font-weight:700;color:${profit>=0?'#16a34a':'#dc2626'}">${fmtMoney(profit)}</td>
+      <td style="color:var(--muted);font-size:12px">${r.note||'—'}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openCompanyRevenueModal('${r.month}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCompanyRevenue('${r.month}')">🗑</button>
+      </div></td>
+    </tr>`;}).join('') : '<tr><td colspan="6"><div class="empty"><div class="ei">💰</div><p>Chưa có dữ liệu doanh thu công ty</p></div></td></tr>';
+}
+
+function renderSales() {
+  const empId = document.getElementById('sales-filter-nv').value;
+  const month = document.getElementById('sales-filter-month').value;
+
+  const nvSel = document.getElementById('sales-filter-nv');
+  const curNv = nvSel.value;
+  const nvIds = [...new Set(DB.sales.map(s=>s.empId))];
+  nvSel.innerHTML = '<option value="">Tất cả nhân viên</option>' + nvIds.map(id=>`<option value="${id}" ${id===curNv?'selected':''}>${empName(id)}</option>`).join('');
+
+  const moSel = document.getElementById('sales-filter-month');
+  const curMo = moSel.value;
+  const months = [...new Set(DB.sales.map(s=>s.month))].sort().reverse();
+  moSel.innerHTML = '<option value="">Tất cả tháng</option>' + months.map(m=>`<option value="${m}" ${m===curMo?'selected':''}>${fmtMonth(m)}</option>`).join('');
+
+  let list = DB.sales.filter(s => (!empId||s.empId===empId) && (!month||s.month===month));
+  list = list.slice().sort((a,b)=>b.month.localeCompare(a.month));
+
+  const tbody = document.getElementById('sales-tbody');
+  tbody.innerHTML = list.length ? list.map(s=>{
+    const pct = s.target ? Math.round((s.revenue||0)/s.target*100) : null;
+    return `<tr>
+      <td><div class="name-cell"><div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(empName(s.empId))}</div><span style="font-weight:500">${empName(s.empId)}</span></div></td>
+      <td>${fmtMonth(s.month)}</td>
+      <td style="font-weight:600;color:#16a34a">${fmtMoney(s.revenue)}</td>
+      <td>${fmtMoney(s.target)}</td>
+      <td>${pct===null?'—':`<span class="badge ${pct>=100?'badge-green':pct>=70?'badge-amber':'badge-red'}">${pct}%</span>`}</td>
+      <td>${fmtMoney(s.commission)}</td>
+      <td style="color:var(--muted);font-size:12px">${s.note||'—'}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openSalesModal(${s.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSales(${s.id})">🗑</button>
+      </div></td>
+    </tr>`;}).join('') : '<tr><td colspan="8"><div class="empty"><div class="ei">👤</div><p>Chưa có dữ liệu doanh thu nhân viên</p></div></td></tr>';
+}
+
+// ── ROOMS & CUSTOMERS PAGE ──
+function renderRoomsPage() {
+  renderRooms();
+  renderCustomers();
+}
+
+function bookingsForRoom(roomId) { return DB.bookings.filter(b=>b.roomId===roomId && b.status!=='Đã hủy'); }
+function bookingsForCustomer(custId) { return DB.bookings.filter(b=>b.custId===custId && b.status!=='Đã hủy'); }
+
+function renderRooms() {
+  const tbody = document.getElementById('room-tbody');
+  const list = DB.rooms;
+  tbody.innerHTML = list.length ? list.map(r=>`
+    <tr>
+      <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">${r.id}</code></td>
+      <td style="font-weight:600">${r.name}</td>
+      <td><span class="tag">${r.type}</span></td>
+      <td>${r.capacity||'—'} người</td>
+      <td style="font-weight:600">${fmtMoney(r.priceHour)}</td>
+      <td>${r.staffId ? empName(r.staffId) : '—'}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openRoomModal('${r.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRoom('${r.id}')">🗑</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="8"><div class="empty"><div class="ei">🏠</div><p>Chưa có phòng nào</p></div></td></tr>';
+}
+
+function renderCustomers() {
+  const search = document.getElementById('cust-search').value.toLowerCase();
+  let list = DB.customers.filter(c => {
+    const q = `${c.id} ${c.name} ${c.phone} ${c.idcard} ${c.company}`.toLowerCase();
+    return !search || q.includes(search);
+  });
+  const tbody = document.getElementById('cust-tbody');
+  tbody.innerHTML = list.length ? list.map(c=>{
+    const myBookings = bookingsForCustomer(c.id);
+    const totalSpent = myBookings.reduce((a,b)=>a+(Number(b.total)||0),0);
+    const totalDebt  = myBookings.reduce((a,b)=>a+Math.max((Number(b.total)||0)-(Number(b.paid)||0),0),0);
+    return `<tr>
+      <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">${c.id}</code></td>
+      <td><div class="name-cell"><div class="avatar">${initials(c.name)}</div><div><div style="font-weight:600">${c.name}</div>${c.company?`<div style="font-size:11px;color:var(--muted)">${c.company}</div>`:''}</div></div></td>
+      <td>${c.phone||'—'}</td>
+      <td>${c.idcard||'—'}</td>
+      <td>${c.company||'—'}</td>
+      <td style="font-weight:600;color:#16a34a">${fmtMoney(totalSpent)}</td>
+      <td style="font-weight:600;color:${totalDebt>0?'#dc2626':'#94a3b8'}">${totalDebt>0?fmtMoney(totalDebt):'Không nợ'}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openCustomerModal('${c.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCustomer('${c.id}')">🗑</button>
+      </div></td>
+    </tr>`;}).join('') : '<tr><td colspan="8"><div class="empty"><div class="ei">👥</div><p>Chưa có khách hàng nào</p></div></td></tr>';
+}
+
+// ── BOOKINGS PAGE ──
+function renderBookingsPage() {
+  renderBookingKpi();
+  renderBookings();
+  renderRoomCustCharts();
+}
+
+function renderBookingKpi() {
+  const b = DB.bookings.filter(b=>b.status!=='Đã hủy');
+  const totalRevenue = b.reduce((a,x)=>a+(Number(x.total)||0),0);
+  const totalPaid = b.reduce((a,x)=>a+(Number(x.paid)||0),0);
+  const totalDebt = totalRevenue - totalPaid;
+  const thisMonth = new Date().toISOString().slice(0,7);
+  const monthRevenue = b.filter(x=>x.date && x.date.slice(0,7)===thisMonth).reduce((a,x)=>a+(Number(x.total)||0),0);
+
+  document.getElementById('booking-kpi').innerHTML = `
+    <div class="kpi-card" style="--accent:var(--blue)"><div class="kpi-label">🗓️ Tổng lượt đặt</div><div class="kpi-value">${b.length}</div><div class="kpi-sub">${DB.rooms.length} phòng đang quản lý</div></div>
+    <div class="kpi-card" style="--accent:var(--green)"><div class="kpi-label">💰 Tổng doanh thu</div><div class="kpi-value" style="font-size:22px">${fmtMoney(totalRevenue)}</div><div class="kpi-sub">từ thuê phòng</div></div>
+    <div class="kpi-card" style="--accent:var(--cyan)"><div class="kpi-label">📅 DT tháng này</div><div class="kpi-value" style="font-size:22px">${fmtMoney(monthRevenue)}</div><div class="kpi-sub">${thisMonth}</div></div>
+    <div class="kpi-card" style="--accent:var(--red)"><div class="kpi-label">⚠️ Công nợ</div><div class="kpi-value" style="font-size:22px">${fmtMoney(totalDebt)}</div><div class="kpi-sub">chưa thu</div></div>
+  `;
+}
+
+function renderBookings() {
+  const search = document.getElementById('booking-search').value.toLowerCase();
+  const roomId = document.getElementById('booking-filter-room').value;
+  const pay    = document.getElementById('booking-filter-pay').value;
+  const sortVal = document.getElementById('booking-sort').value;
+  const from = document.getElementById('booking-filter-from').value;
+  const to = document.getElementById('booking-filter-to').value;
+
+  const roomSel = document.getElementById('booking-filter-room');
+  const curRoom = roomSel.value;
+  roomSel.innerHTML = '<option value="">Tất cả phòng</option>' + DB.rooms.map(r=>`<option value="${r.id}" ${r.id===curRoom?'selected':''}>${r.name}</option>`).join('');
+
+  let list = DB.bookings.filter(b => {
+    const q = `${roomName(b.roomId)} ${custName(b.custId)}`.toLowerCase();
+    const matchSearch = !search||q.includes(search);
+    const matchRoom = !roomId||b.roomId===roomId;
+    const matchPay = !pay||b.status===pay;
+    const matchDate = inDateRange(b.date, from, to);
+    return matchSearch && matchRoom && matchPay && matchDate;
+  });
+
+  list = list.slice().sort((a,b) => {
+    const debtA = Math.max((Number(a.total)||0)-(Number(a.paid)||0),0);
+    const debtB = Math.max((Number(b.total)||0)-(Number(b.paid)||0),0);
+    switch(sortVal) {
+      case 'date-asc':   return cmpDate(a.date, b.date);
+      case 'room-asc':   return cmpStr(roomName(a.roomId), roomName(b.roomId));
+      case 'total-desc': return cmpNum(b.total, a.total);
+      case 'debt-desc':  return cmpNum(debtB, debtA);
+      case 'date-desc':
+      default:           return cmpDate(b.date, a.date);
+    }
+  });
+
+  const tbody = document.getElementById('booking-tbody');
+  tbody.innerHTML = list.length ? list.map(b=>{
+    const debt = Math.max((Number(b.total)||0)-(Number(b.paid)||0),0);
+    const payMap = {'Đã thanh toán':'badge-green','Còn nợ':'badge-red','Đã hủy':'badge-gray'};
+    return `<tr>
+      <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">B${String(b.id).padStart(3,'0')}</code></td>
+      <td style="font-weight:600">${roomName(b.roomId)}</td>
+      <td>${custName(b.custId)}</td>
+      <td>${fmt(b.date)}</td>
+      <td>${b.start||'—'}</td>
+      <td>${b.end||'—'}</td>
+      <td>${b.hours||'—'}</td>
+      <td>${fmtMoney(b.price)}</td>
+      <td style="font-weight:700;color:#1d4ed8">${fmtMoney(b.total)}</td>
+      <td style="color:#16a34a">${fmtMoney(b.paid)}</td>
+      <td style="font-weight:600;color:${debt>0?'#dc2626':'#94a3b8'}">${debt>0?fmtMoney(debt):'—'}</td>
+      <td>${b.staffId?empName(b.staffId):'—'}</td>
+      <td><span class="badge ${payMap[b.status]||'badge-gray'}">${b.status}</span></td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openBookingModal(${b.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteBooking(${b.id})">🗑</button>
+      </div></td>
+    </tr>`;}).join('') : '<tr><td colspan="14"><div class="empty"><div class="ei">🗓️</div><p>Chưa có lượt đặt phòng nào</p></div></td></tr>';
+}
+
+function renderRoomCustCharts() {
+  const colors = ['#2563eb','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
+  const b = DB.bookings.filter(b=>b.status!=='Đã hủy');
+
+  const roomMap = {};
+  b.forEach(x=>{ roomMap[x.roomId] = (roomMap[x.roomId]||0) + (Number(x.total)||0); });
+  const maxRoom = Math.max(...Object.values(roomMap),1);
+  const roomEntries = Object.entries(roomMap).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('room-revenue-chart').innerHTML = roomEntries.length ? roomEntries.map(([id,v],i)=>
+    `<div class="chart-row"><div class="lbl">${roomName(id)}</div><div class="bar-out"><div class="bar-in" style="width:${v/maxRoom*100}%;background:${colors[i%colors.length]}"></div></div><div class="val">${fmtMoney(v)}</div></div>`
+  ).join('') : '<div class="empty"><p>Chưa có dữ liệu</p></div>';
+
+  const custMap = {};
+  b.forEach(x=>{ custMap[x.custId] = (custMap[x.custId]||0) + (Number(x.total)||0); });
+  const maxCust = Math.max(...Object.values(custMap),1);
+  const custEntries = Object.entries(custMap).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('cust-revenue-chart').innerHTML = custEntries.length ? custEntries.map(([id,v],i)=>
+    `<div class="chart-row"><div class="lbl">${custName(id)}</div><div class="bar-out"><div class="bar-in" style="width:${v/maxCust*100}%;background:${colors[i%colors.length]}"></div></div><div class="val">${fmtMoney(v)}</div></div>`
+  ).join('') : '<div class="empty"><p>Chưa có dữ liệu</p></div>';
+}
+
+// ── SERVICE PAYMENT TRACKING ──
+function spCompletedSteps(sp) {
+  return SP_STEPS.filter(s => sp.steps && sp.steps[s.key]).length;
+}
+function spCurrentStepKey(sp) {
+  // returns the first incomplete step key, or 'done' if all complete
+  for(const s of SP_STEPS) { if(!sp.steps || !sp.steps[s.key]) return s.key; }
+  return 'done';
+}
+function spProgressBadge(sp) {
+  const done = spCompletedSteps(sp);
+  const total = SP_STEPS.length;
+  if(done === total) return `<span class="badge badge-green">✅ Hoàn tất (${done}/${total})</span>`;
+  if(done === 0) return `<span class="badge badge-gray">Chưa bắt đầu (0/${total})</span>`;
+  return `<span class="badge badge-blue">${done}/${total} bước</span>`;
+}
+function spStepCell(sp, key) {
+  const d = sp.steps ? sp.steps[key] : '';
+  if(d) return `<span class="badge badge-green" title="${fmt(d)}">✅ ${fmt(d)}</span>`;
+  return `<span class="badge badge-gray">—</span>`;
+}
+
+function renderServicePay() {
+  const search = document.getElementById('sp-search').value.toLowerCase();
+  const service = document.getElementById('sp-filter-service').value;
+  const stepFilter = document.getElementById('sp-filter-step').value;
+  const sortVal = document.getElementById('sp-sort').value;
+  const from = document.getElementById('sp-filter-from').value;
+  const to = document.getElementById('sp-filter-to').value;
+
+  const svcSel = document.getElementById('sp-filter-service');
+  const curSvc = svcSel.value;
+  svcSel.innerHTML = '<option value="">Tất cả dịch vụ</option>' + DB.serviceList.map(s=>`<option ${s===curSvc?'selected':''}>${s}</option>`).join('');
+
+  let list = DB.servicePay.filter(sp => {
+    const q = `${sp.id} ${custName(sp.custId)} ${sp.service}`.toLowerCase();
+    const matchSearch = !search || q.includes(search);
+    const matchService = !service || sp.service === service;
+    const matchDate = inDateRange(sp.date, from, to);
+    let matchStep = true;
+    if(stepFilter) matchStep = spCurrentStepKey(sp) === stepFilter;
+    return matchSearch && matchService && matchDate && matchStep;
+  });
+
+  list = list.slice().sort((a,b) => {
+    switch(sortVal) {
+      case 'date-asc':       return cmpDate(a.date, b.date);
+      case 'total-desc':     return cmpNum(b.total, a.total);
+      case 'progress-asc':   return cmpNum(spCompletedSteps(a), spCompletedSteps(b));
+      case 'name-asc':       return cmpStr(custName(a.custId), custName(b.custId));
+      case 'date-desc':
+      default:               return cmpDate(b.date, a.date);
+    }
+  });
+
+  const tbody = document.getElementById('sp-tbody');
+  tbody.innerHTML = list.length ? list.map(sp=>`
+    <tr>
+      <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">${sp.id}</code></td>
+      <td><div class="name-cell"><div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(custName(sp.custId))}</div><span style="font-weight:500">${custName(sp.custId)}</span></div></td>
+      <td><span class="tag">${sp.service}</span></td>
+      <td>${fmt(sp.date)}</td>
+      <td style="font-weight:700;color:#1d4ed8">${fmtMoney(sp.total)}</td>
+      <td>${spStepCell(sp,'quote')}</td>
+      <td>${spStepCell(sp,'request')}</td>
+      <td>${spStepCell(sp,'acceptance')}</td>
+      <td>${spStepCell(sp,'payment')}</td>
+      <td>${spStepCell(sp,'vat')}</td>
+      <td>${spProgressBadge(sp)}</td>
+      <td>${sp.staffId?empName(sp.staffId):'—'}</td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="openServicePayModal('${sp.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteServicePay('${sp.id}')">🗑</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="13"><div class="empty"><div class="ei">💼</div><p>Chưa có hợp đồng dịch vụ nào</p></div></td></tr>';
+
+  renderServicePayKpi();
+  renderServicePayCharts();
+}
+
+function renderServicePayKpi() {
+  const list = DB.servicePay;
+  const totalValue = list.reduce((a,sp)=>a+(Number(sp.total)||0),0);
+  const fullyPaid = list.filter(sp=>sp.steps && sp.steps.payment).length;
+  const pendingVat = list.filter(sp=>sp.steps && sp.steps.payment && !sp.steps.vat).length;
+  const notStarted = list.filter(sp=>spCompletedSteps(sp)===0).length;
+
+  document.getElementById('sp-kpi').innerHTML = `
+    <div class="kpi-card" style="--accent:var(--blue)"><div class="kpi-label">💼 Tổng hợp đồng DV</div><div class="kpi-value">${list.length}</div><div class="kpi-sub">${DB.serviceList.length} loại dịch vụ</div></div>
+    <div class="kpi-card" style="--accent:var(--green)"><div class="kpi-label">💰 Tổng giá trị</div><div class="kpi-value" style="font-size:22px">${fmtMoney(totalValue)}</div><div class="kpi-sub">tất cả hợp đồng</div></div>
+    <div class="kpi-card" style="--accent:var(--cyan)"><div class="kpi-label">✅ Đã thanh toán</div><div class="kpi-value">${fullyPaid}</div><div class="kpi-sub">/ ${list.length} hợp đồng</div></div>
+    <div class="kpi-card" style="--accent:var(--amber)"><div class="kpi-label">🧾 Chờ xuất VAT</div><div class="kpi-value">${pendingVat}</div><div class="kpi-sub">đã TT, chưa có HĐ VAT</div></div>
+    <div class="kpi-card" style="--accent:var(--red)"><div class="kpi-label">⏳ Chưa bắt đầu</div><div class="kpi-value">${notStarted}</div><div class="kpi-sub">chưa có báo giá</div></div>
+  `;
+}
+
+function renderServicePayCharts() {
+  const colors = ['#2563eb','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
+  const list = DB.servicePay;
+
+  const svcMap = {};
+  list.forEach(sp => { svcMap[sp.service] = (svcMap[sp.service]||0) + (Number(sp.total)||0); });
+  const maxSvc = Math.max(...Object.values(svcMap),1);
+  const svcEntries = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('sp-service-chart').innerHTML = svcEntries.length ? svcEntries.map(([name,v],i)=>
+    `<div class="chart-row"><div class="lbl">${name}</div><div class="bar-out"><div class="bar-in" style="width:${v/maxSvc*100}%;background:${colors[i%colors.length]}"></div></div><div class="val">${fmtMoney(v)}</div></div>`
+  ).join('') : '<div class="empty"><p>Chưa có dữ liệu</p></div>';
+
+  const pending = list.filter(sp=>spCompletedSteps(sp) < SP_STEPS.length)
+    .map(sp=>({...sp, stepKey:spCurrentStepKey(sp)}))
+    .sort((a,b)=>cmpDate(a.date,b.date));
+  const stepLabel = {quote:'Chờ Báo giá',request:'Chờ Đề nghị TT',acceptance:'Chờ Nghiệm thu',payment:'Chờ Thanh toán',vat:'Chờ Hóa đơn VAT'};
+  document.getElementById('sp-pending-list').innerHTML = pending.length ? pending.slice(0,8).map(sp=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1"><div style="font-weight:600;font-size:13px">${custName(sp.custId)} — ${sp.service}</div><div style="font-size:12px;color:var(--muted)">${sp.id} · ${fmtMoney(sp.total)}</div></div>
+      <span class="badge badge-amber">${stepLabel[sp.stepKey]||sp.stepKey}</span>
+    </div>`).join('') : '<div class="empty"><div class="ei">🎉</div><p>Không có đơn nào đang chờ xử lý</p></div>';
+}
+
+// ══════════════════════════════════════════════
+// MODALS — open / close
+// ══════════════════════════════════════════════
+let editEmpId = null, editTaskId = null, editTrackId = null, editContractId = null, editCompRevMonth = null, editSalesId = null;
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+
+// ── EMPLOYEE ──
+function openEmployeeModal(id=null) {
+  editEmpId = id;
+  clearFieldErrors('modal-employee');
+  document.getElementById('emp-modal-title').textContent = id ? 'Sửa Nhân Viên' : 'Thêm Nhân Viên';
+  const e = id ? DB.employees.find(e=>e.id===id) : {};
+  const fields = ['id','name','dept','position','joindate','salary','status','taxcode','socialid','note',
+                   'gender','dob','idcard','idcarddate','idcardplace','nationality','marital','hometown','address','education',
+                   'email','phone'];
+  fields.forEach(f => {
+    const el = document.getElementById('e-'+f);
+    if(el) el.value = (e && e[f]!==undefined && e[f]!==null) ? e[f] : (f==='nationality' && !id ? 'Việt Nam' : '');
+  });
+  document.getElementById('e-emergency-name').value = e.emergencyName || '';
+  document.getElementById('e-emergency-phone').value = e.emergencyPhone || '';
+  document.getElementById('e-emergency-relation').value = e.emergencyRelation || '';
+  document.getElementById('e-bankaccount').value = e.bankAccount || '';
+  document.getElementById('e-bankname').value = e.bankName || '';
+
+  // reset to first tab
+  const modal = document.getElementById('modal-employee');
+  modal.querySelectorAll('.mtab').forEach((t,i)=>t.classList.toggle('active', i===0));
+  modal.querySelectorAll('.mtab-panel').forEach((p,i)=>p.classList.toggle('active', i===0));
+
+  openModal('modal-employee');
+  setTimeout(()=>document.getElementById('e-id').focus(), 50);
+}
+
+function saveEmployee() {
+  clearFieldErrors('modal-employee');
+  const idVal = document.getElementById('e-id').value.trim();
+  const nameVal = document.getElementById('e-name').value.trim();
+
+  let hasError = false;
+  if(!idVal) { markFieldError('e-id'); hasError = true; }
+  if(!nameVal) { markFieldError('e-name'); hasError = true; }
+  if(!editEmpId && idVal && DB.employees.find(e=>e.id===idVal)) {
+    markFieldError('e-id'); hasError = true;
+    toast('❌ Mã Nhân Viên "'+idVal+'" đã tồn tại!', true);
+  }
+  if(hasError) {
+    if(idVal && nameVal) { /* duplicate already toasted */ } else {
+      toast('❌ Vui lòng nhập đầy đủ Mã NV và Họ tên (đánh dấu *)', true);
+    }
+    // jump to job tab where required fields live
+    const modal = document.getElementById('modal-employee');
+    modal.querySelectorAll('.mtab').forEach((t,i)=>t.classList.toggle('active', i===0));
+    modal.querySelectorAll('.mtab-panel').forEach((p,i)=>p.classList.toggle('active', i===0));
+    return;
+  }
+
+  const data = {
+    id: idVal, name: nameVal,
+    dept: document.getElementById('e-dept').value,
+    position: document.getElementById('e-position').value.trim(),
+    joindate: document.getElementById('e-joindate').value,
+    salary: document.getElementById('e-salary').value ? Number(document.getElementById('e-salary').value) : '',
+    status: document.getElementById('e-status').value,
+    taxcode: document.getElementById('e-taxcode').value.trim(),
+    socialid: document.getElementById('e-socialid').value.trim(),
+    note: document.getElementById('e-note').value.trim(),
+    gender: document.getElementById('e-gender').value,
+    dob: document.getElementById('e-dob').value,
+    idcard: document.getElementById('e-idcard').value.trim(),
+    idcarddate: document.getElementById('e-idcarddate').value,
+    idcardplace: document.getElementById('e-idcardplace').value.trim(),
+    nationality: document.getElementById('e-nationality').value.trim(),
+    marital: document.getElementById('e-marital').value,
+    hometown: document.getElementById('e-hometown').value.trim(),
+    address: document.getElementById('e-address').value.trim(),
+    education: document.getElementById('e-education').value.trim(),
+    email: document.getElementById('e-email').value.trim(),
+    phone: document.getElementById('e-phone').value.trim(),
+    emergencyName: document.getElementById('e-emergency-name').value.trim(),
+    emergencyPhone: document.getElementById('e-emergency-phone').value.trim(),
+    emergencyRelation: document.getElementById('e-emergency-relation').value.trim(),
+    bankAccount: document.getElementById('e-bankaccount').value.trim(),
+    bankName: document.getElementById('e-bankname').value.trim(),
+  };
+
+  if(editEmpId) {
+    const idx = DB.employees.findIndex(e=>e.id===editEmpId);
+    if(idx === -1) { toast('❌ Không tìm thấy nhân viên để cập nhật!', true); return; }
+    DB.employees[idx] = data;
+  } else {
+    DB.employees.push(data);
+  }
+
+  if(!saveDB()) return;
+  closeModal('modal-employee');
+  renderEmployees();
+  if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  toast(editEmpId?'✅ Đã cập nhật nhân viên':'✅ Đã thêm nhân viên mới: '+data.name);
+}
+
+function deleteEmployee(id) {
+  if(!confirm('Xóa nhân viên này? Các hợp đồng / theo dõi công việc liên quan vẫn được giữ nhưng sẽ hiển thị "—".')) return;
+  DB.employees = DB.employees.filter(e=>e.id!==id);
+  saveDB(); renderEmployees(); renderDashboard();
+  toast('🗑 Đã xóa nhân viên');
+}
+
+// ── TASK ──
+function openTaskModal(id=null) {
+  editTaskId = id;
+  clearFieldErrors('modal-task');
+  document.getElementById('task-modal-title').textContent = id ? 'Sửa Công Việc' : 'Thêm Công Việc';
+  const t = id ? DB.tasks.find(t=>t.id===id) : {};
+  ['id','name','desc','project','priority','status','start','deadline','tag','note'].forEach(f => {
+    const el = document.getElementById('t-'+f);
+    if(el) el.value = t[f]||'';
+  });
+  const creatorSel = document.getElementById('t-creator');
+  creatorSel.innerHTML = DB.employees.map(e=>`<option value="${e.id}" ${e.id===t.creator?'selected':''}>${e.name}</option>`).join('');
+  openModal('modal-task');
+  setTimeout(()=>document.getElementById('t-id').focus(), 50);
+}
+
+function saveTask() {
+  clearFieldErrors('modal-task');
+  const idVal = document.getElementById('t-id').value.trim();
+  const nameVal = document.getElementById('t-name').value.trim();
+  let hasError = false;
+  if(!idVal) { markFieldError('t-id'); hasError = true; }
+  if(!nameVal) { markFieldError('t-name'); hasError = true; }
+  if(!editTaskId && idVal && DB.tasks.find(t=>t.id===idVal)) {
+    markFieldError('t-id'); hasError = true;
+    toast('❌ Mã Công Việc "'+idVal+'" đã tồn tại!', true);
+  }
+  if(hasError) { if(idVal&&nameVal){} else toast('❌ Vui lòng nhập đầy đủ Mã CV và Tên!', true); return; }
+
+  const data = {
+    id: idVal, name: nameVal,
+    desc: document.getElementById('t-desc').value.trim(),
+    project: document.getElementById('t-project').value.trim(),
+    priority: document.getElementById('t-priority').value,
+    status: document.getElementById('t-status').value,
+    start: document.getElementById('t-start').value,
+    deadline: document.getElementById('t-deadline').value,
+    tag: document.getElementById('t-tag').value.trim(),
+    note: document.getElementById('t-note').value.trim(),
+    creator: document.getElementById('t-creator').value,
+  };
+  if(editTaskId) {
+    const idx = DB.tasks.findIndex(t=>t.id===editTaskId);
+    DB.tasks[idx] = data;
+  } else {
+    DB.tasks.push(data);
+  }
+  if(!saveDB()) return;
+  closeModal('modal-task'); renderTasks();
+  if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  toast(editTaskId?'✅ Đã cập nhật công việc':'✅ Đã thêm công việc mới');
+}
+
+function deleteTask(id) {
+  if(!confirm('Xóa công việc này? Các bản theo dõi liên quan cũng sẽ bị xóa.')) return;
+  DB.tasks = DB.tasks.filter(t=>t.id!==id);
+  DB.tracking = DB.tracking.filter(t=>t.taskId!==id);
+  saveDB(); renderTasks(); renderDashboard();
+  toast('🗑 Đã xóa công việc');
+}
+
+// ── TRACKING ──
+function openTrackingModal(id=null) {
+  editTrackId = id;
+  document.getElementById('track-modal-title').textContent = id ? 'Cập Nhật Tiến Độ' : 'Giao Công Việc';
+  const t = id ? DB.tracking.find(t=>t.id===id) : {};
+
+  const taskSel = document.getElementById('tr-task');
+  taskSel.innerHTML = DB.tasks.map(tk=>`<option value="${tk.id}" ${tk.id===t.taskId?'selected':''}>${tk.name}</option>`).join('');
+  const empSel = document.getElementById('tr-emp');
+  empSel.innerHTML = DB.employees.map(e=>`<option value="${e.id}" ${e.id===t.empId?'selected':''}>${e.name}</option>`).join('');
+
+  ['assigndate','deadline','progress','status','donedate','rating','note'].forEach(f => {
+    const el = document.getElementById('tr-'+f);
+    if(el) el.value = (t[f]!==undefined && t[f]!==null) ? t[f] : '';
+  });
+  if(!id) {
+    document.getElementById('tr-assigndate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('tr-progress').value = '0';
+    document.getElementById('tr-status').value = 'Chưa bắt đầu';
+  }
+  openModal('modal-tracking');
+}
+
+function saveTracking() {
+  const taskId = document.getElementById('tr-task').value;
+  const empId  = document.getElementById('tr-emp').value;
+  if(!taskId||!empId) { toast('❌ Vui lòng chọn công việc và nhân viên!', true); return; }
+  const data = {
+    taskId, empId,
+    assigndate:document.getElementById('tr-assigndate').value,
+    deadline:  document.getElementById('tr-deadline').value,
+    progress:  Number(document.getElementById('tr-progress').value)||0,
+    status:    document.getElementById('tr-status').value,
+    donedate:  document.getElementById('tr-donedate').value,
+    rating:    document.getElementById('tr-rating').value,
+    note:      document.getElementById('tr-note').value.trim(),
+  };
+  if(editTrackId) {
+    const idx = DB.tracking.findIndex(t=>t.id===editTrackId);
+    DB.tracking[idx] = {...data, id:editTrackId};
+  } else {
+    const newId = DB.tracking.length ? Math.max(...DB.tracking.map(t=>t.id))+1 : 1;
+    DB.tracking.push({...data, id:newId});
+  }
+  if(!saveDB()) return;
+  closeModal('modal-tracking'); renderTracking();
+  if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  toast(editTrackId?'✅ Đã cập nhật tiến độ':'✅ Đã giao công việc');
+}
+
+function deleteTracking(id) {
+  if(!confirm('Xóa bản ghi này?')) return;
+  DB.tracking = DB.tracking.filter(t=>t.id!==id);
+  saveDB(); renderTracking(); renderDashboard();
+  toast('🗑 Đã xóa bản ghi');
+}
+
+// ── CONTRACTS ──
+let pendingContractFile = null;
+function handleContractFile(e) {
+  const file = e.target.files[0];
+  if(!file) { pendingContractFile = null; return; }
+  if(file.size > 4*1024*1024) {
+    toast('⚠️ File quá lớn (>4MB), có thể gây lỗi lưu dữ liệu offline. Vẫn tiếp tục…', true);
+  }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    pendingContractFile = { name: file.name, data: ev.target.result };
+    document.getElementById('c-file-chip').innerHTML = `<span class="file-chip">📎 ${file.name} <span class="x" onclick="removeContractFile()">✕</span></span>`;
+  };
+  reader.readAsDataURL(file);
+}
+function removeContractFile() {
+  pendingContractFile = { name:'', data:'' };
+  document.getElementById('c-file-chip').innerHTML = '';
+  document.getElementById('c-file').value = '';
+}
+
+function openContractModal(id=null) {
+  editContractId = id;
+  clearFieldErrors('modal-contract');
+  pendingContractFile = null;
+  document.getElementById('c-file').value = '';
+  document.getElementById('contract-modal-title').textContent = id ? 'Sửa Hợp Đồng' : 'Thêm Hợp Đồng';
+  const c = id ? DB.contracts.find(c=>c.id===id) : {};
+
+  const empSel = document.getElementById('c-emp');
+  empSel.innerHTML = DB.employees.map(e=>`<option value="${e.id}" ${e.id===c.empId?'selected':''}>${e.name} (${e.id})</option>`).join('');
+
+  ['id','type','status','start','end','salary','allowance','signer','signdate','note'].forEach(f => {
+    const el = document.getElementById('c-'+f);
+    if(el) el.value = (c[f]!==undefined && c[f]!==null) ? c[f] : '';
+  });
+
+  document.getElementById('c-file-chip').innerHTML = c.fileName ? `<span class="file-chip">📎 ${c.fileName} <span class="x" onclick="removeContractFile()">✕</span></span>` : '';
+
+  openModal('modal-contract');
+  setTimeout(()=>document.getElementById('c-id').focus(), 50);
+}
+
+function saveContract() {
+  clearFieldErrors('modal-contract');
+  const idVal = document.getElementById('c-id').value.trim();
+  const empVal = document.getElementById('c-emp').value;
+  let hasError = false;
+  if(!idVal) { markFieldError('c-id'); hasError = true; }
+  if(!editContractId && idVal && DB.contracts.find(c=>c.id===idVal)) {
+    markFieldError('c-id'); hasError = true;
+    toast('❌ Số hợp đồng "'+idVal+'" đã tồn tại!', true);
+  }
+  if(!empVal) { hasError = true; toast('❌ Vui lòng chọn nhân viên!', true); }
+  if(hasError) { if(!idVal) toast('❌ Vui lòng nhập Số Hợp Đồng!', true); return; }
+
+  const existing = editContractId ? DB.contracts.find(c=>c.id===editContractId) : null;
+  const data = {
+    id: idVal, empId: empVal,
+    type: document.getElementById('c-type').value,
+    status: document.getElementById('c-status').value,
+    start: document.getElementById('c-start').value,
+    end: document.getElementById('c-end').value,
+    salary: document.getElementById('c-salary').value ? Number(document.getElementById('c-salary').value) : '',
+    allowance: document.getElementById('c-allowance').value ? Number(document.getElementById('c-allowance').value) : 0,
+    signer: document.getElementById('c-signer').value.trim(),
+    signdate: document.getElementById('c-signdate').value,
+    note: document.getElementById('c-note').value.trim(),
+    fileName: pendingContractFile ? pendingContractFile.name : (existing ? existing.fileName : ''),
+    fileData: pendingContractFile ? pendingContractFile.data : (existing ? existing.fileData : ''),
+  };
+
+  if(editContractId) {
+    const idx = DB.contracts.findIndex(c=>c.id===editContractId);
+    DB.contracts[idx] = data;
+  } else {
+    DB.contracts.push(data);
+  }
+  if(!saveDB()) return;
+  closeModal('modal-contract'); renderContracts();
+  if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  toast(editContractId?'✅ Đã cập nhật hợp đồng':'✅ Đã thêm hợp đồng mới');
+}
+
+function deleteContract(id) {
+  if(!confirm('Xóa hợp đồng này?')) return;
+  DB.contracts = DB.contracts.filter(c=>c.id!==id);
+  saveDB(); renderContracts(); renderDashboard();
+  toast('🗑 Đã xóa hợp đồng');
+}
+
+// ── COMPANY REVENUE ──
+function openCompanyRevenueModal(month=null) {
+  editCompRevMonth = month;
+  document.getElementById('comp-rev-modal-title').textContent = month ? 'Sửa Doanh Thu Công Ty' : 'Thêm Doanh Thu Công Ty';
+  const r = month ? DB.companyRevenue.find(r=>r.month===month) : {};
+  document.getElementById('cr-month').value = r.month || '';
+  document.getElementById('cr-revenue').value = r.revenue!==undefined ? r.revenue : '';
+  document.getElementById('cr-cost').value = r.cost!==undefined ? r.cost : '';
+  document.getElementById('cr-note').value = r.note || '';
+  document.getElementById('cr-month').disabled = !!month;
+  openModal('modal-comp-revenue');
+}
+
+function saveCompanyRevenue() {
+  const month = document.getElementById('cr-month').value;
+  if(!month) { toast('❌ Vui lòng chọn tháng!', true); return; }
+  if(!editCompRevMonth && DB.companyRevenue.find(r=>r.month===month)) {
+    toast('❌ Tháng này đã có dữ liệu doanh thu!', true); return;
+  }
+  const data = {
+    month,
+    revenue: document.getElementById('cr-revenue').value ? Number(document.getElementById('cr-revenue').value) : 0,
+    cost: document.getElementById('cr-cost').value ? Number(document.getElementById('cr-cost').value) : 0,
+    note: document.getElementById('cr-note').value.trim(),
+  };
+  if(editCompRevMonth) {
+    const idx = DB.companyRevenue.findIndex(r=>r.month===editCompRevMonth);
+    DB.companyRevenue[idx] = data;
+  } else {
+    DB.companyRevenue.push(data);
+  }
+  if(!saveDB()) return;
+  document.getElementById('cr-month').disabled = false;
+  closeModal('modal-comp-revenue'); renderCompanyRevenue(); renderRevenueKpi();
+  if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  toast(editCompRevMonth?'✅ Đã cập nhật doanh thu':'✅ Đã thêm doanh thu công ty');
+}
+
+function deleteCompanyRevenue(month) {
+  if(!confirm('Xóa dữ liệu doanh thu tháng này?')) return;
+  DB.companyRevenue = DB.companyRevenue.filter(r=>r.month!==month);
+  saveDB(); renderCompanyRevenue(); renderRevenueKpi(); renderDashboard();
+  toast('🗑 Đã xóa dữ liệu doanh thu');
+}
+
+// ── SALES (per employee) ──
+function openSalesModal(id=null) {
+  editSalesId = id;
+  document.getElementById('sales-modal-title').textContent = id ? 'Sửa Doanh Thu Nhân Viên' : 'Thêm Doanh Thu Nhân Viên';
+  const s = id ? DB.sales.find(s=>s.id===id) : {};
+  const empSel = document.getElementById('s-emp');
+  empSel.innerHTML = DB.employees.map(e=>`<option value="${e.id}" ${e.id===s.empId?'selected':''}>${e.name}</option>`).join('');
+  document.getElementById('s-month').value = s.month || '';
+  document.getElementById('s-revenue').value = s.revenue!==undefined ? s.revenue : '';
+  document.getElementById('s-target').value = s.target!==undefined ? s.target : '';
+  document.getElementById('s-commission').value = s.commission!==undefined ? s.commission : '';
+  document.getElementById('s-note').value = s.note || '';
+  openModal('modal-sales');
+}
+
+function saveSales() {
+  const empId = document.getElementById('s-emp').value;
+  const month = document.getElementById('s-month').value;
+  if(!empId||!month) { toast('❌ Vui lòng chọn nhân viên và tháng!', true); return; }
+  const data = {
+    empId, month,
+    revenue: document.getElementById('s-revenue').value ? Number(document.getElementById('s-revenue').value) : 0,
+    target: document.getElementById('s-target').value ? Number(document.getElementById('s-target').value) : 0,
+    commission: document.getElementById('s-commission').value ? Number(document.getElementById('s-commission').value) : 0,
+    note: document.getElementById('s-note').value.trim(),
+  };
+  if(editSalesId) {
+    const idx = DB.sales.findIndex(s=>s.id===editSalesId);
+    DB.sales[idx] = {...data, id:editSalesId};
+  } else {
+    const newId = DB.sales.length ? Math.max(...DB.sales.map(s=>s.id))+1 : 1;
+    DB.sales.push({...data, id:newId});
+  }
+  if(!saveDB()) return;
+  closeModal('modal-sales'); renderSales(); renderRevenueKpi();
+  if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  toast(editSalesId?'✅ Đã cập nhật doanh thu':'✅ Đã thêm doanh thu nhân viên');
+}
+
+function deleteSales(id) {
+  if(!confirm('Xóa bản ghi doanh thu này?')) return;
+  DB.sales = DB.sales.filter(s=>s.id!==id);
+  saveDB(); renderSales(); renderRevenueKpi(); renderDashboard();
+  toast('🗑 Đã xóa');
+}
+
+// ── ROOM ──
+let editRoomId = null;
+function openRoomModal(id=null) {
+  editRoomId = id;
+  clearFieldErrors('modal-room');
+  document.getElementById('room-modal-title').textContent = id ? 'Sửa Phòng' : 'Thêm Phòng';
+  const r = id ? DB.rooms.find(r=>r.id===id) : {};
+  ['id','name','type','capacity','priceHour','status','note'].forEach(f => {
+    const el = document.getElementById('r-'+f);
+    if(el) el.value = (r[f]!==undefined && r[f]!==null) ? r[f] : '';
+  });
+  const staffSel = document.getElementById('r-staff');
+  staffSel.innerHTML = '<option value="">— Không gán —</option>' + DB.employees.map(e=>`<option value="${e.id}" ${e.id===r.staffId?'selected':''}>${e.name}</option>`).join('');
+  openModal('modal-room');
+  setTimeout(()=>document.getElementById('r-id').focus(), 50);
+}
+
+function saveRoom() {
+  clearFieldErrors('modal-room');
+  const idVal = document.getElementById('r-id').value.trim();
+  const nameVal = document.getElementById('r-name').value.trim();
+  let hasError = false;
+  if(!idVal) { markFieldError('r-id'); hasError = true; }
+  if(!nameVal) { markFieldError('r-name'); hasError = true; }
+  if(!editRoomId && idVal && DB.rooms.find(r=>r.id===idVal)) {
+    markFieldError('r-id'); hasError = true;
+    toast('❌ Mã Phòng "'+idVal+'" đã tồn tại!', true);
+  }
+  if(hasError) { if(idVal&&nameVal){} else toast('❌ Vui lòng nhập đầy đủ Mã Phòng và Tên Phòng!', true); return; }
+
+  const data = {
+    id: idVal, name: nameVal,
+    type: document.getElementById('r-type').value,
+    capacity: document.getElementById('r-capacity').value ? Number(document.getElementById('r-capacity').value) : '',
+    priceHour: document.getElementById('r-priceHour').value ? Number(document.getElementById('r-priceHour').value) : 0,
+    status: document.getElementById('r-status').value,
+    staffId: document.getElementById('r-staff').value,
+    note: document.getElementById('r-note').value.trim(),
+  };
+  if(editRoomId) {
+    const idx = DB.rooms.findIndex(r=>r.id===editRoomId);
+    DB.rooms[idx] = data;
+  } else {
+    DB.rooms.push(data);
+  }
+  if(!saveDB()) return;
+  closeModal('modal-room'); renderRooms();
+  if(document.getElementById('page-bookings').classList.contains('active')) { renderBookingKpi(); renderBookings(); renderRoomCustCharts(); }
+  toast(editRoomId?'✅ Đã cập nhật phòng':'✅ Đã thêm phòng mới: '+data.name);
+}
+
+function deleteRoom(id) {
+  if(!confirm('Xóa phòng này? Các lượt đặt phòng liên quan vẫn được giữ nhưng sẽ hiển thị "—".')) return;
+  DB.rooms = DB.rooms.filter(r=>r.id!==id);
+  saveDB(); renderRooms();
+  toast('🗑 Đã xóa phòng');
+}
+
+// ── CUSTOMER ──
+let editCustId = null;
+function openCustomerModal(id=null) {
+  editCustId = id;
+  clearFieldErrors('modal-customer');
+  document.getElementById('cust-modal-title').textContent = id ? 'Sửa Khách Hàng' : 'Thêm Khách Hàng';
+  const c = id ? DB.customers.find(c=>c.id===id) : {};
+  ['id','name','phone','email','idcard','company','address','note'].forEach(f => {
+    const el = document.getElementById('cu-'+f);
+    if(el) el.value = (c[f]!==undefined && c[f]!==null) ? c[f] : '';
+  });
+  openModal('modal-customer');
+  setTimeout(()=>document.getElementById('cu-id').focus(), 50);
+}
+
+function saveCustomer() {
+  clearFieldErrors('modal-customer');
+  const idVal = document.getElementById('cu-id').value.trim();
+  const nameVal = document.getElementById('cu-name').value.trim();
+  let hasError = false;
+  if(!idVal) { markFieldError('cu-id'); hasError = true; }
+  if(!nameVal) { markFieldError('cu-name'); hasError = true; }
+  if(!editCustId && idVal && DB.customers.find(c=>c.id===idVal)) {
+    markFieldError('cu-id'); hasError = true;
+    toast('❌ Mã KH "'+idVal+'" đã tồn tại!', true);
+  }
+  if(hasError) { if(idVal&&nameVal){} else toast('❌ Vui lòng nhập đầy đủ Mã KH và Tên Khách Hàng!', true); return; }
+
+  const data = {
+    id: idVal, name: nameVal,
+    phone: document.getElementById('cu-phone').value.trim(),
+    email: document.getElementById('cu-email').value.trim(),
+    idcard: document.getElementById('cu-idcard').value.trim(),
+    company: document.getElementById('cu-company').value.trim(),
+    address: document.getElementById('cu-address').value.trim(),
+    note: document.getElementById('cu-note').value.trim(),
+  };
+  if(editCustId) {
+    const idx = DB.customers.findIndex(c=>c.id===editCustId);
+    DB.customers[idx] = data;
+  } else {
+    DB.customers.push(data);
+  }
+  if(!saveDB()) return;
+  closeModal('modal-customer'); renderCustomers();
+  toast(editCustId?'✅ Đã cập nhật khách hàng':'✅ Đã thêm khách hàng mới: '+data.name);
+}
+
+function deleteCustomer(id) {
+  if(!confirm('Xóa khách hàng này? Lịch sử đặt phòng liên quan vẫn được giữ nhưng sẽ hiển thị "—".')) return;
+  DB.customers = DB.customers.filter(c=>c.id!==id);
+  saveDB(); renderCustomers();
+  toast('🗑 Đã xóa khách hàng');
+}
+
+// ── BOOKING ──
+let editBookingId = null;
+
+function timeToHours(start, end) {
+  if(!start || !end) return 0;
+  const [sh,sm] = start.split(':').map(Number);
+  const [eh,em] = end.split(':').map(Number);
+  let diff = (eh*60+em) - (sh*60+sm);
+  if(diff < 0) diff += 24*60;
+  return Math.round((diff/60)*100)/100;
+}
+
+function bookingAutoFill() {
+  const roomId = document.getElementById('b-room').value;
+  const room = DB.rooms.find(r=>r.id===roomId);
+  if(room) {
+    document.getElementById('b-price').value = room.priceHour || 0;
+    if(room.staffId) document.getElementById('b-staff').value = room.staffId;
+  }
+  bookingCalc();
+}
+
+function bookingCalc() {
+  const start = document.getElementById('b-start').value;
+  const end = document.getElementById('b-end').value;
+  const price = Number(document.getElementById('b-price').value) || 0;
+  const hours = timeToHours(start, end);
+  if(hours > 0 && price > 0) {
+    document.getElementById('b-total').value = Math.round(hours * price);
+  }
+}
+
+function openBookingModal(id=null) {
+  editBookingId = id;
+  document.getElementById('booking-modal-title').textContent = id ? 'Sửa Đặt Phòng' : 'Thêm Đặt Phòng';
+  const b = id ? DB.bookings.find(b=>b.id===id) : {};
+
+  const roomSel = document.getElementById('b-room');
+  roomSel.innerHTML = DB.rooms.map(r=>`<option value="${r.id}" ${r.id===b.roomId?'selected':''}>${r.name} (${fmtMoney(r.priceHour)}/giờ)</option>`).join('');
+  const custSel = document.getElementById('b-customer');
+  custSel.innerHTML = DB.customers.map(c=>`<option value="${c.id}" ${c.id===b.custId?'selected':''}>${c.name}</option>`).join('');
+  const staffSel = document.getElementById('b-staff');
+  staffSel.innerHTML = '<option value="">— Không gán —</option>' + DB.employees.map(e=>`<option value="${e.id}" ${e.id===b.staffId?'selected':''}>${e.name}</option>`).join('');
+
+  ['date','start','end','price','total','paid','note'].forEach(f => {
+    const el = document.getElementById('b-'+f);
+    if(el) el.value = (b[f]!==undefined && b[f]!==null) ? b[f] : '';
+  });
+  document.getElementById('b-paystatus').value = b.status || 'Đã thanh toán';
+
+  if(!id) {
+    document.getElementById('b-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('b-paid').value = '0';
+    // pre-fill price from first room
+    const firstRoom = DB.rooms[0];
+    if(firstRoom) document.getElementById('b-price').value = firstRoom.priceHour || 0;
+  }
+  openModal('modal-booking');
+}
+
+function saveBooking() {
+  const roomId = document.getElementById('b-room').value;
+  const custId = document.getElementById('b-customer').value;
+  if(!roomId || !custId) { toast('❌ Vui lòng chọn phòng và khách hàng!', true); return; }
+
+  const start = document.getElementById('b-start').value;
+  const end = document.getElementById('b-end').value;
+  const hours = timeToHours(start, end);
+  const price = document.getElementById('b-price').value ? Number(document.getElementById('b-price').value) : 0;
+  const totalInput = document.getElementById('b-total').value;
+  const total = totalInput ? Number(totalInput) : Math.round(hours*price);
+
+  const data = {
+    roomId, custId,
+    date: document.getElementById('b-date').value,
+    start, end, hours,
+    price, total,
+    paid: document.getElementById('b-paid').value ? Number(document.getElementById('b-paid').value) : 0,
+    staffId: document.getElementById('b-staff').value,
+    status: document.getElementById('b-paystatus').value,
+    note: document.getElementById('b-note').value.trim(),
+  };
+
+  if(editBookingId) {
+    const idx = DB.bookings.findIndex(b=>b.id===editBookingId);
+    DB.bookings[idx] = {...data, id:editBookingId};
+  } else {
+    const newId = DB.bookings.length ? Math.max(...DB.bookings.map(b=>b.id))+1 : 1;
+    DB.bookings.push({...data, id:newId});
+  }
+  if(!saveDB()) return;
+  closeModal('modal-booking');
+  renderBookingKpi(); renderBookings(); renderRoomCustCharts();
+  if(document.getElementById('page-rooms').classList.contains('active')) renderCustomers();
+  toast(editBookingId?'✅ Đã cập nhật đặt phòng':'✅ Đã thêm đặt phòng mới');
+}
+
+function deleteBooking(id) {
+  if(!confirm('Xóa lượt đặt phòng này?')) return;
+  DB.bookings = DB.bookings.filter(b=>b.id!==id);
+  saveDB(); renderBookingKpi(); renderBookings(); renderRoomCustCharts();
+  toast('🗑 Đã xóa lượt đặt phòng');
+}
+
+// ── SERVICE PAYMENT ──
+let editServicePayId = null;
+
+function toggleStepDate(key) {
+  const checkbox = document.getElementById('sp-step-'+key);
+  const dateInput = document.getElementById('sp-date-'+key);
+  if(checkbox.checked && !dateInput.value) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+  } else if(!checkbox.checked) {
+    dateInput.value = '';
+  }
+}
+
+function refreshServiceSelect(selectedVal) {
+  const sel = document.getElementById('sp-service');
+  sel.innerHTML = DB.serviceList.map(s=>`<option ${s===selectedVal?'selected':''}>${s}</option>`).join('');
+}
+
+function addCustomService() {
+  const input = document.getElementById('sp-service-custom');
+  const val = input.value.trim();
+  if(!val) { toast('❌ Vui lòng nhập tên dịch vụ mới!', true); return; }
+  if(DB.serviceList.includes(val)) {
+    toast('⚠️ Dịch vụ này đã có trong danh sách', true);
+    refreshServiceSelect(val);
+    input.value = '';
+    return;
+  }
+  DB.serviceList.push(val);
+  saveDB();
+  refreshServiceSelect(val);
+  input.value = '';
+  toast('✅ Đã thêm dịch vụ mới: '+val);
+}
+
+function openServicePayModal(id=null) {
+  editServicePayId = id;
+  clearFieldErrors('modal-servicepay');
+  document.getElementById('sp-modal-title').textContent = id ? 'Sửa Hợp Đồng Dịch Vụ' : 'Thêm Hợp Đồng Dịch Vụ';
+  const sp = id ? DB.servicePay.find(sp=>sp.id===id) : {};
+
+  document.getElementById('sp-id').value = sp.id || '';
+  document.getElementById('sp-id').disabled = !!id;
+
+  const custSel = document.getElementById('sp-customer');
+  custSel.innerHTML = DB.customers.map(c=>`<option value="${c.id}" ${c.id===sp.custId?'selected':''}>${c.name}</option>`).join('');
+  refreshServiceSelect(sp.service);
+  document.getElementById('sp-service-custom').value = '';
+
+  const staffSel = document.getElementById('sp-staff');
+  staffSel.innerHTML = '<option value="">— Không gán —</option>' + DB.employees.map(e=>`<option value="${e.id}" ${e.id===sp.staffId?'selected':''}>${e.name}</option>`).join('');
+
+  document.getElementById('sp-date').value = sp.date || (!id ? new Date().toISOString().split('T')[0] : '');
+  document.getElementById('sp-total').value = sp.total!==undefined ? sp.total : '';
+  document.getElementById('sp-note').value = sp.note || '';
+
+  SP_STEPS.forEach(s => {
+    const d = (sp.steps && sp.steps[s.key]) ? sp.steps[s.key] : '';
+    document.getElementById('sp-step-'+s.key).checked = !!d;
+    document.getElementById('sp-date-'+s.key).value = d;
+  });
+
+  openModal('modal-servicepay');
+  if(!id) setTimeout(()=>document.getElementById('sp-id').focus(), 50);
+}
+
+function saveServicePay() {
+  clearFieldErrors('modal-servicepay');
+  const idVal = document.getElementById('sp-id').value.trim();
+  const custVal = document.getElementById('sp-customer').value;
+  let hasError = false;
+  if(!idVal) { markFieldError('sp-id'); hasError = true; }
+  if(!editServicePayId && idVal && DB.servicePay.find(sp=>sp.id===idVal)) {
+    markFieldError('sp-id'); hasError = true;
+    toast('❌ Số HĐ "'+idVal+'" đã tồn tại!', true);
+  }
+  if(!custVal) { hasError = true; toast('❌ Vui lòng chọn khách hàng!', true); }
+  if(hasError) { if(!idVal) toast('❌ Vui lòng nhập Số HĐ / Mã Đơn!', true); return; }
+
+  const steps = {};
+  SP_STEPS.forEach(s => {
+    steps[s.key] = document.getElementById('sp-step-'+s.key).checked ? (document.getElementById('sp-date-'+s.key).value || new Date().toISOString().split('T')[0]) : '';
+  });
+
+  const data = {
+    id: idVal, custId: custVal,
+    service: document.getElementById('sp-service').value,
+    date: document.getElementById('sp-date').value,
+    total: document.getElementById('sp-total').value ? Number(document.getElementById('sp-total').value) : 0,
+    staffId: document.getElementById('sp-staff').value,
+    note: document.getElementById('sp-note').value.trim(),
+    steps,
+  };
+
+  if(editServicePayId) {
+    const idx = DB.servicePay.findIndex(sp=>sp.id===editServicePayId);
+    DB.servicePay[idx] = data;
+  } else {
+    DB.servicePay.push(data);
+  }
+  if(!saveDB()) return;
+  document.getElementById('sp-id').disabled = false;
+  closeModal('modal-servicepay'); renderServicePay();
+  toast(editServicePayId?'✅ Đã cập nhật hợp đồng dịch vụ':'✅ Đã thêm hợp đồng dịch vụ mới');
+}
+
+function deleteServicePay(id) {
+  if(!confirm('Xóa hợp đồng dịch vụ này?')) return;
+  DB.servicePay = DB.servicePay.filter(sp=>sp.id!==id);
+  saveDB(); renderServicePay();
+  toast('🗑 Đã xóa hợp đồng dịch vụ');
+}
+
+// ══════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════
+function exportData() {
+  const json = JSON.stringify(DB, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'hr_data_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  toast('💾 Đã xuất dữ liệu JSON');
+}
+
+function importData() { document.getElementById('importFile').click(); }
+
+function loadImport(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(data.employees && data.tasks && data.tracking) {
+        data.contracts = data.contracts || [];
+        data.companyRevenue = data.companyRevenue || [];
+        data.sales = data.sales || [];
+        data.rooms = data.rooms || [];
+        data.customers = data.customers || [];
+        data.bookings = data.bookings || [];
+        data.serviceList = data.serviceList || JSON.parse(JSON.stringify(defaultServiceList));
+        data.servicePay = data.servicePay || [];
+        DB = data; saveDB(); renderPage(currentPage); renderDashboard();
+        toast('📂 Đã nhập dữ liệu thành công');
+      } else alert('File JSON không hợp lệ! (thiếu employees/tasks/tracking)');
+    } catch(err) { alert('Không đọc được file JSON: ' + err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+document.addEventListener('click', e => {
+  if(e.target.classList.contains('overlay')) e.target.classList.remove('show');
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'));
+});
+
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('vi-VN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+show('dashboard');
+</script>
+</body>
+</html>
