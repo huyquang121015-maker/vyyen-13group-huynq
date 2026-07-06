@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sổ Quản Lý Phòng Khám</title>
+<style>
+  :root{
+    --bg: #F4F7F6;
+    --surface: #FFFFFF;
+    --primary: #134A9A;
+    --primary-dark: #0A2955;
+    --primary-light: #367EE6;
+    --accent: #C97B4A;
+    --text: #1C2B2A;
+    --text-muted: #5C6F6D;
+    --border: #DCE6E4;
+    --danger: #B84C4C;
+    --danger-bg: #FBEDEC;
+    --font-display: Georgia, 'Times New Roman', serif;
+    --font-body: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
+    --font-mono: 'Courier New', Courier, monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:230px;
+    flex-shrink:0;
+    background: var(--primary-dark);
+    color:#EAF3F1;
+    display:flex;
+    flex-direction:column;
+    padding:28px 0;
+  }
+  .brand{
+    padding:0 22px 24px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.12);
+    margin-bottom:18px;
+  }
+  .brand-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .brand-row img{
+    height:32px;
+    width:auto;
+    flex-shrink:0;
+  }
+  .logo-box{
+    background:#fff;
+    border-radius:10px;
+    padding:10px 12px;
+    display:inline-block;
+    margin-bottom:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.18);
+  }
+  .logo-box img{
+    display:block;
+    height:34px;
+    width:auto;
+  }
+  .brand .cross{
+    width:34px;height:34px;
+    border-radius:8px;
+    background: var(--primary-light);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;
+    font-family: var(--font-display);
+    font-weight:bold;
+    color:#fff;
+    font-size:18px;
+  }
+  .brand h1{
+    font-family: var(--font-display);
+    font-size:18px;
+    margin:0 0 2px 0;
+    letter-spacing:0.3px;
+  }
+  .brand p{
+    margin:0;
+    font-size:11.5px;
+    color:#9FC2BB;
+    letter-spacing:0.4px;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 22px;
+    cursor:pointer;
+    font-size:14.5px;
+    color:#CFE4E0;
+    border-left:3px solid transparent;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-item .tag{
+    width:8px;height:8px;border-radius:50%;
+    background:#5f8f88;
+    flex-shrink:0;
+  }
+  .nav-item:hover{ background:rgba(255,255,255,0.06); }
+  .nav-item.active{
+    background: rgba(255,255,255,0.08);
+    color:#fff;
+    border-left-color: var(--accent);
+    font-weight:600;
+  }
+  .nav-item.active .tag{ background: var(--accent); }
+
+  .sidebar-footer{
+    margin-top:auto;
+    padding:16px 22px 0 22px;
+    font-size:10.5px;
+    color:#7FA39C;
+    border-top:1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-decoration{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px 24px;
+    opacity:0.9;
+  }
+  .sidebar-decoration img{
+    width:110px;
+    height:110px;
+    opacity:0.9;
+  }
+  .sidebar-decoration .deco-label{
+    margin-top:14px;
+    font-family: var(--font-display);
+    font-size:22px;
+    letter-spacing:2px;
+    color: rgba(255,255,255,0.5);
+  }
+  .sidebar-decoration .deco-sub{
+    margin-top:4px;
+    font-size:10.5px;
+    color: rgba(159,194,187,0.6);
+    letter-spacing:0.5px;
+  }
+  .live-clock{
+    background: rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:8px;
+    padding:10px 12px;
+    margin-bottom:12px;
+    text-align:center;
+  }
+  .live-clock .clock-time{
+    font-family: var(--font-mono);
+    font-size:19px;
+    font-weight:bold;
+    color:#fff;
+    letter-spacing:0.5px;
+    line-height:1.2;
+  }
+  .live-clock .clock-date{
+    font-size:11px;
+    color:#9FC2BB;
+    margin-top:3px;
+    text-transform:capitalize;
+  }
+
+  /* ---------- Main ---------- */
+  .main{
+    flex:1;
+    padding:34px 40px 60px 40px;
+    max-width:1100px;
+  }
+  .page{ display:none; }
+  .page.active{ display:block; }
+
+  .page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .page-header h2{
+    font-family: var(--font-display);
+    font-size:28px;
+    margin:0 0 4px 0;
+    color: var(--primary-dark);
+  }
+  .page-header .subtitle{
+    color: var(--text-muted);
+    font-size:13.5px;
+  }
+  .count-badge{
+    font-family: var(--font-mono);
+    background: var(--surface);
+    border:1px solid var(--border);
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12.5px;
+    color: var(--primary);
+  }
+
+  .toolbar{
+    display:flex;
+    gap:12px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .search-box{
+    flex:1;
+    min-width:240px;
+    position:relative;
+  }
+  .search-box input{
+    width:100%;
+    padding:11px 14px 11px 38px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:14px;
+    background: var(--surface);
+    font-family: var(--font-body);
+  }
+  .search-box input:focus{
+    outline:none;
+    border-color: var(--primary-light);
+    box-shadow:0 0 0 3px rgba(31,138,124,0.12);
+  }
+  .search-box::before{
+    content:"🔍";
+    position:absolute;
+    left:12px; top:50%;
+    transform:translateY(-50%);
+    font-size:13px;
+    opacity:0.55;
+  }
+  .btn{
+    padding:11px 20px;
+    border:none;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    font-family: var(--font-body);
+    transition: filter 0.15s, transform 0.05s;
+    white-space:nowrap;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn-primary{
+    background: var(--primary);
+    color:#fff;
+  }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-secondary{
+    background: var(--surface);
+    color: var(--primary-dark);
+    border:1px solid var(--border);
+  }
+  .btn-secondary:hover{ background:#EEF4F3; }
+  .btn-danger{
+    background: var(--danger-bg);
+    color: var(--danger);
+    border:1px solid #EAD0CE;
+  }
+  .btn-danger:hover{ filter:brightness(0.97); }
+  .btn-small{
+    padding:7px 12px;
+    font-size:12.5px;
+  }
+
+  /* ---------- Form (record editor) ---------- */
+  .form-panel{
+    background: var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:22px 24px;
+    margin-bottom:26px;
+    display:none;
+    animation: slideDown 0.18s ease;
+  }
+  @keyframes slideDown{
+    from{ opacity:0; transform:translateY(-6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .form-panel.open{ display:block; }
+  .form-panel h3{
+    font-family: var(--font-display);
+    margin:0 0 16px 0;
+    font-size:17px;
+    color: var(--primary-dark);
+    border-bottom:2px solid var(--border);
+    padding-bottom:10px;
+  }
+  .form-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:14px 18px;
+  }
+  .form-grid .full{ grid-column: 1 / -1; }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    color: var(--text-muted);
+    margin-bottom:5px;
+    font-weight:600;
+  }
+  .field input, .field textarea, .field select{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    font-size:14px;
+    font-family: var(--font-body);
+    background:#FCFDFD;
+  }
+  .field textarea{ resize:vertical; min-height:56px; }
+  .field input:focus, .field textarea:focus, .field select:focus{
+    outline:none;
+    border-color: var(--primary-light);
+    box-shadow:0 0 0 3px rgba(31,138,124,0.12);
+  }
+  .form-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+    justify-content:flex-end;
+  }
+
+  /* ---------- Record cards ---------- */
+  .records{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap:16px;
+  }
+  .card{
+    background: var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:0;
+    position:relative;
+    overflow:hidden;
+    transition: box-shadow 0.15s, transform 0.1s;
+  }
+  .card:hover{
+    box-shadow:0 4px 14px rgba(20,92,84,0.09);
+  }
+  .card-tab{
+    height:5px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  }
+  .card-body{ padding:16px 18px 14px 18px; }
+  .card-name{
+    font-family: var(--font-display);
+    font-size:17px;
+    font-weight:bold;
+    color: var(--primary-dark);
+    margin:0 0 2px 0;
+  }
+  .card-meta{
+    font-size:12px;
+    color: var(--text-muted);
+    margin-bottom:10px;
+    font-family: var(--font-mono);
+  }
+  .card-row{
+    font-size:13px;
+    color: var(--text);
+    margin-bottom:5px;
+    display:flex;
+    gap:6px;
+  }
+  .card-row .label{
+    color: var(--text-muted);
+    min-width:78px;
+    flex-shrink:0;
+  }
+  .card-note{
+    margin-top:10px;
+    padding:8px 10px;
+    background:#F6F4EF;
+    border-left:3px solid var(--accent);
+    font-size:12.5px;
+    color:#5A4A38;
+    border-radius:0 6px 6px 0;
+  }
+  .card-actions{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+  }
+
+  /* ---------- Image attachments ---------- */
+  .image-field{
+    border:1px dashed var(--border);
+    border-radius:8px;
+    padding:12px;
+    background:#FBFCFC;
+  }
+  .image-field input[type="file"]{
+    font-size:12.5px;
+    width:100%;
+  }
+  .image-previews{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+  }
+  .image-thumb{
+    position:relative;
+    width:64px;
+    height:64px;
+    border-radius:6px;
+    overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .image-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    cursor:pointer;
+  }
+  .image-thumb .remove-x{
+    position:absolute;
+    top:2px; right:2px;
+    width:18px; height:18px;
+    background:rgba(0,0,0,0.6);
+    color:#fff;
+    border:none;
+    border-radius:50%;
+    font-size:11px;
+    line-height:18px;
+    text-align:center;
+    cursor:pointer;
+    padding:0;
+  }
+  .card-images{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:10px;
+  }
+  .card-images img{
+    width:52px;
+    height:52px;
+    object-fit:cover;
+    border-radius:6px;
+    border:1px solid var(--border);
+    cursor:pointer;
+    transition: transform 0.1s;
+  }
+  .card-images img:hover{ transform:scale(1.05); }
+
+  .img-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,25,24,0.82);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+  }
+  .img-modal.open{ display:flex; }
+  .img-modal img{
+    max-width:90vw;
+    max-height:85vh;
+    border-radius:8px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  }
+  .img-modal .close-modal{
+    position:absolute;
+    top:22px; right:28px;
+    color:#fff;
+    font-size:28px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    line-height:1;
+  }
+
+  /* ---------- Task progress ---------- */
+  .task-progress-track{
+    width:100%;
+    height:8px;
+    background:#E7EEEC;
+    border-radius:6px;
+    overflow:hidden;
+    margin:8px 0 4px 0;
+  }
+  .task-progress-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius:6px;
+    transition: width 0.2s;
+  }
+  .task-progress-label{
+    font-family: var(--font-mono);
+    font-size:11.5px;
+    color: var(--text-muted);
+    text-align:right;
+  }
+  .status-badge{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:20px;
+    font-size:11.5px;
+    font-weight:600;
+  }
+  .status-badge.done{
+    background:#E4F3EC;
+    color:#227A55;
+  }
+  .status-badge.pending{
+    background:#FBEFE3;
+    color:#B4671F;
+  }
+  .task-due{
+    font-size:12px;
+    color: var(--text-muted);
+  }
+  .task-due.overdue{
+    color: var(--danger);
+    font-weight:600;
+  }
+  .field-inline{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .field-inline input[type="range"]{
+    flex:1;
+  }
+  .field-inline .range-value{
+    font-family: var(--font-mono);
+    font-size:13px;
+    color: var(--primary-dark);
+    min-width:40px;
+    text-align:right;
+  }
+
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .icon{ font-size:38px; margin-bottom:10px; }
+  .empty-state h4{
+    font-family: var(--font-display);
+    color: var(--primary-dark);
+    margin:0 0 6px 0;
+  }
+
+  ::placeholder{ color:#9FB0AD; }
+
+  @media (max-width: 720px){
+    body{ flex-direction:column; }
+    .sidebar{ width:100%; flex-direction:row; padding:14px 10px; overflow-x:auto; }
+    .brand{ display:none; }
+    .sidebar-footer{ display:none; }
+    .nav-item{ white-space:nowrap; border-left:none; border-bottom:3px solid transparent; }
+    .nav-item.active{ border-left-color:transparent; border-bottom-color:var(--accent); }
+    .main{ padding:22px 16px 50px 16px; }
+    .form-grid{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-row">
+        <img src="data:image/png;base64,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" alt="MSC Clinic logo">
+        <h1>Msc Clinic</h1>
+      </div>
+      <p>Huynq91 Quản lý cá nhân</p>
+    </div>
+    <div class="nav-item active" data-page="patients">
+      <span class="tag"></span> Hồ sơ Bệnh nhân
+    </div>
+    <div class="nav-item" data-page="doctors">
+      <span class="tag"></span> Hồ sơ Bác sĩ
+    </div>
+    <div class="nav-item" data-page="vocab">
+      <span class="tag"></span> Từ vựng Tiếng Nhật
+    </div>
+    <div class="nav-item" data-page="partners">
+      <span class="tag"></span> Đối tác
+    </div>
+    <div class="nav-item" data-page="employees">
+      <span class="tag"></span> Hồ sơ Nhân viên
+    </div>
+    <div class="nav-item" data-page="tasks">
+      <span class="tag"></span> Công việc cá nhân
+    </div>
+    <div class="sidebar-decoration">
+      <img src="data:image/png;base64,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" alt="Logo tế bào">
+      <div class="deco-label">肝細胞</div>
+      <div class="deco-sub">Tế bào gốc</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="live-clock">
+        <div class="clock-time" id="live-clock-time">--:--:--</div>
+        <div class="clock-date" id="live-clock-date">-- / -- / ----</div>
+      </div>
+      HeoManly
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ============ PATIENTS PAGE ============ -->
+    <div class="page active" id="page-patients">
+      <div class="page-header">
+        <div>
+          <h2>Hồ sơ Bệnh nhân</h2>
+          <div class="subtitle">Danh sách khách hàng / bệnh nhân của phòng khám</div>
+        </div>
+        <div class="count-badge" id="patient-count">0 hồ sơ</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="patient-search" placeholder="Tìm theo tên, số điện thoại, CCCD hoặc sale chăm sóc...">
+        </div>
+        <button class="btn btn-primary" onclick="openPatientForm()">+ Thêm bệnh nhân</button>
+      </div>
+
+      <div class="form-panel" id="patient-form-panel">
+        <h3 id="patient-form-title">Thêm bệnh nhân mới</h3>
+        <input type="hidden" id="patient-edit-id">
+        <div class="form-grid">
+          <div class="field">
+            <label>Họ và tên *</label>
+            <input type="text" id="p-name" placeholder="Nguyễn Văn A">
+          </div>
+          <div class="field">
+            <label>Ngày tháng năm sinh</label>
+            <input type="date" id="p-dob">
+          </div>
+          <div class="field">
+            <label>Địa chỉ</label>
+            <input type="text" id="p-address" placeholder="Số nhà, đường, phường/xã, quận/huyện...">
+          </div>
+          <div class="field">
+            <label>Số điện thoại</label>
+            <input type="text" id="p-phone" placeholder="09xxxxxxxx">
+          </div>
+          <div class="field">
+            <label>Số căn cước công dân</label>
+            <input type="text" id="p-cccd" placeholder="0xxxxxxxxxxx">
+          </div>
+          <div class="field">
+            <label>Ngày cấp CCCD</label>
+            <input type="date" id="p-cccd-date">
+          </div>
+          <div class="field full">
+            <label>Nơi cấp CCCD</label>
+            <input type="text" id="p-cccd-place" placeholder="Cục Cảnh sát QLHC về TTXH">
+          </div>
+          <div class="field full">
+            <label>Sale chăm sóc</label>
+            <input type="text" id="p-sale" placeholder="Tên nhân viên sale phụ trách chăm sóc khách">
+          </div>
+          <div class="field full">
+            <label>Ảnh đính kèm</label>
+            <div class="image-field">
+              <input type="file" id="p-images-input" accept="image/*" multiple onchange="handlePatientImages(event)">
+              <div class="image-previews" id="p-images-preview"></div>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Lưu chú về khách</label>
+            <textarea id="p-note" placeholder="Tiền sử bệnh, dị ứng, ghi chú khác..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closePatientForm()">Hủy</button>
+          <button class="btn btn-primary" onclick="savePatient()">Lưu hồ sơ</button>
+        </div>
+      </div>
+
+      <div class="records" id="patient-list"></div>
+    </div>
+
+    <!-- ============ DOCTORS PAGE ============ -->
+    <div class="page" id="page-doctors">
+      <div class="page-header">
+        <div>
+          <h2>Hồ sơ Bác sĩ</h2>
+          <div class="subtitle">Danh sách bác sĩ đang công tác tại phòng khám</div>
+        </div>
+        <div class="count-badge" id="doctor-count">0 hồ sơ</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="doctor-search" placeholder="Tìm theo tên hoặc nơi công tác...">
+        </div>
+        <button class="btn btn-primary" onclick="openDoctorForm()">+ Thêm bác sĩ</button>
+      </div>
+
+      <div class="form-panel" id="doctor-form-panel">
+        <h3 id="doctor-form-title">Thêm bác sĩ mới</h3>
+        <input type="hidden" id="doctor-edit-id">
+        <div class="form-grid">
+          <div class="field">
+            <label>Họ và tên *</label>
+            <input type="text" id="d-name" placeholder="BS. Trần Thị B">
+          </div>
+          <div class="field">
+            <label>Tuổi</label>
+            <input type="number" id="d-age" placeholder="45" min="0" max="120">
+          </div>
+          <div class="field full">
+            <label>Địa chỉ</label>
+            <input type="text" id="d-address" placeholder="Địa chỉ nơi ở">
+          </div>
+          <div class="field full">
+            <label>Nơi đang công tác</label>
+            <input type="text" id="d-workplace" placeholder="Phòng khám Đa khoa ABC">
+          </div>
+          <div class="field">
+            <label>Số điện thoại</label>
+            <input type="text" id="d-phone" placeholder="09xxxxxxxx">
+          </div>
+          <div class="field full">
+            <label>Quá trình công tác</label>
+            <textarea id="d-history" placeholder="2010-2015: Bệnh viện X; 2015-nay: Phòng khám ABC..."></textarea>
+          </div>
+          <div class="field full">
+            <label>Lưu chú về bác sĩ</label>
+            <textarea id="d-note" placeholder="Chuyên khoa, chứng chỉ, ghi chú khác..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closeDoctorForm()">Hủy</button>
+          <button class="btn btn-primary" onclick="saveDoctor()">Lưu hồ sơ</button>
+        </div>
+      </div>
+
+      <div class="records" id="doctor-list"></div>
+    </div>
+
+    <!-- ============ VOCAB PAGE ============ -->
+    <div class="page" id="page-vocab">
+      <div class="page-header">
+        <div>
+          <h2>Từ vựng Tiếng Nhật</h2>
+          <div class="subtitle">Sổ tay từ vựng dùng trong phòng khám</div>
+        </div>
+        <div class="count-badge" id="vocab-count">0 từ</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="vocab-search" placeholder="Tìm bằng tiếng Việt hoặc tiếng Nhật (không phân biệt hoa/thường)...">
+        </div>
+        <button class="btn btn-primary" onclick="openVocabForm()">+ Thêm từ vựng</button>
+      </div>
+
+      <div class="form-panel" id="vocab-form-panel">
+        <h3 id="vocab-form-title">Thêm từ vựng mới</h3>
+        <input type="hidden" id="v-edit-id">
+        <div class="form-grid">
+          <div class="field">
+            <label>Tiếng Việt *</label>
+            <input type="text" id="v-vi" placeholder="Ví dụ: bệnh viện">
+          </div>
+          <div class="field">
+            <label>Tiếng Nhật *</label>
+            <input type="text" id="v-ja" placeholder="Ví dụ: 病院">
+          </div>
+          <div class="field">
+            <label>Cách đọc</label>
+            <input type="text" id="v-reading" placeholder="Ví dụ: びょういん / byouin">
+          </div>
+          <div class="field full">
+            <label>Lưu ý</label>
+            <textarea id="v-note" placeholder="Cách dùng, ví dụ câu, phân biệt từ đồng nghĩa..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closeVocabForm()">Hủy</button>
+          <button class="btn btn-primary" onclick="saveVocab()">Lưu từ vựng</button>
+        </div>
+      </div>
+
+      <div class="records" id="vocab-list"></div>
+    </div>
+
+    <!-- ============ PARTNERS PAGE ============ -->
+    <div class="page" id="page-partners">
+      <div class="page-header">
+        <div>
+          <h2>Đối tác</h2>
+          <div class="subtitle">Danh sách đối tác / người giới thiệu của phòng khám</div>
+        </div>
+        <div class="count-badge" id="partner-count">0 hồ sơ</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="partner-search" placeholder="Tìm theo tên, số điện thoại hoặc nguồn giới thiệu...">
+        </div>
+        <button class="btn btn-primary" onclick="openPartnerForm()">+ Thêm đối tác</button>
+      </div>
+
+      <div class="form-panel" id="partner-form-panel">
+        <h3 id="partner-form-title">Thêm đối tác mới</h3>
+        <input type="hidden" id="pt-edit-id">
+        <div class="form-grid">
+          <div class="field">
+            <label>Họ và tên *</label>
+            <input type="text" id="pt-name" placeholder="Nguyễn Văn A">
+          </div>
+          <div class="field">
+            <label>Ngày tháng năm sinh</label>
+            <input type="date" id="pt-dob">
+          </div>
+          <div class="field">
+            <label>Địa chỉ</label>
+            <input type="text" id="pt-address" placeholder="Số nhà, đường, phường/xã, quận/huyện...">
+          </div>
+          <div class="field">
+            <label>Số điện thoại</label>
+            <input type="text" id="pt-phone" placeholder="09xxxxxxxx">
+          </div>
+          <div class="field full">
+            <label>Nguồn / Ai giới thiệu</label>
+            <input type="text" id="pt-source" placeholder="Ví dụ: Chị Hoa (bệnh nhân cũ), Facebook, Bác sĩ B...">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closePartnerForm()">Hủy</button>
+          <button class="btn btn-primary" onclick="savePartner()">Lưu hồ sơ</button>
+        </div>
+      </div>
+
+      <div class="records" id="partner-list"></div>
+    </div>
+
+    <!-- ============ EMPLOYEES PAGE ============ -->
+    <div class="page" id="page-employees">
+      <div class="page-header">
+        <div>
+          <h2>Hồ sơ Nhân viên</h2>
+          <div class="subtitle">Danh sách nhân viên đang làm việc tại phòng khám</div>
+        </div>
+        <div class="count-badge" id="employee-count">0 hồ sơ</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="employee-search" placeholder="Tìm theo tên, vị trí/phòng ban hoặc SĐT...">
+        </div>
+        <button class="btn btn-primary" onclick="openEmployeeForm()">+ Thêm nhân viên</button>
+      </div>
+
+      <div class="form-panel" id="employee-form-panel">
+        <h3 id="employee-form-title">Thêm nhân viên mới</h3>
+        <input type="hidden" id="e-edit-id">
+        <div class="form-grid">
+          <div class="field">
+            <label>Họ và tên *</label>
+            <input type="text" id="e-name" placeholder="Nguyễn Văn A">
+          </div>
+          <div class="field">
+            <label>Ngày tháng năm sinh</label>
+            <input type="date" id="e-dob">
+          </div>
+          <div class="field full">
+            <label>Địa chỉ</label>
+            <input type="text" id="e-address" placeholder="Số nhà, đường, phường/xã, quận/huyện...">
+          </div>
+          <div class="field">
+            <label>Số điện thoại</label>
+            <input type="text" id="e-phone" placeholder="09xxxxxxxx">
+          </div>
+          <div class="field">
+            <label>Vị trí / Phòng ban</label>
+            <input type="text" id="e-position" placeholder="Ví dụ: Lễ tân, Sale, Điều dưỡng...">
+          </div>
+          <div class="field full">
+            <label>Loại hợp đồng</label>
+            <input type="text" id="e-contract" placeholder="Ví dụ: Thử việc, Chính thức, Thời vụ...">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closeEmployeeForm()">Hủy</button>
+          <button class="btn btn-primary" onclick="saveEmployee()">Lưu hồ sơ</button>
+        </div>
+      </div>
+
+      <div class="records" id="employee-list"></div>
+    </div>
+
+    <!-- ============ TASKS PAGE ============ -->
+    <div class="page" id="page-tasks">
+      <div class="page-header">
+        <div>
+          <h2>Công việc cá nhân</h2>
+          <div class="subtitle">Quản lý tiến độ công việc cần làm</div>
+        </div>
+        <div class="count-badge" id="task-count">0 việc</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="task-search" placeholder="Tìm theo nội dung công việc...">
+        </div>
+        <button class="btn btn-primary" onclick="openTaskForm()">+ Thêm công việc</button>
+      </div>
+
+      <div class="form-panel" id="task-form-panel">
+        <h3 id="task-form-title">Thêm công việc mới</h3>
+        <input type="hidden" id="t-edit-id">
+        <div class="form-grid">
+          <div class="field full">
+            <label>Nội dung công việc *</label>
+            <textarea id="t-content" placeholder="Mô tả công việc cần làm..."></textarea>
+          </div>
+          <div class="field full">
+            <label>Tiến độ hiện tại</label>
+            <div class="field-inline">
+              <input type="range" id="t-progress" min="0" max="100" step="5" value="0" oninput="document.getElementById('t-progress-value').textContent = this.value + '%'">
+              <span class="range-value" id="t-progress-value">0%</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Trạng thái</label>
+            <select id="t-status">
+              <option value="pending">Chưa hoàn thành</option>
+              <option value="done">Đã hoàn thành</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Thời gian dự kiến hoàn thành</label>
+            <input type="date" id="t-due">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closeTaskForm()">Hủy</button>
+          <button class="btn btn-primary" onclick="saveTask()">Lưu công việc</button>
+        </div>
+      </div>
+
+      <div class="records" id="task-list"></div>
+    </div>
+
+  </div>
+
+  <div class="img-modal" id="img-modal" onclick="closeImageModal(event)">
+    <button class="close-modal" onclick="closeImageModal(event)">&times;</button>
+    <img id="img-modal-src" src="" alt="Ảnh phóng to">
+  </div>
+
+<script>
+  // ---------- Storage helpers ----------
+  const PATIENTS_KEY = "clinic_patients_v1";
+  const DOCTORS_KEY = "clinic_doctors_v1";
+  const VOCAB_KEY = "clinic_vocab_v1";
+  const PARTNERS_KEY = "clinic_partners_v1";
+  const EMPLOYEES_KEY = "clinic_employees_v1";
+  const TASKS_KEY = "clinic_tasks_v1";
+
+  function loadData(key){
+    try{
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      console.error("Lỗi đọc dữ liệu:", e);
+      return [];
+    }
+  }
+  function saveData(key, arr){
+    try{
+      localStorage.setItem(key, JSON.stringify(arr));
+    }catch(e){
+      alert("Không thể lưu dữ liệu vào trình duyệt. Bộ nhớ có thể đã đầy.");
+      console.error(e);
+    }
+  }
+
+  let patients = loadData(PATIENTS_KEY);
+  let doctors = loadData(DOCTORS_KEY);
+  let vocab = loadData(VOCAB_KEY);
+  let partners = loadData(PARTNERS_KEY);
+  let employees = loadData(EMPLOYEES_KEY);
+  let tasks = loadData(TASKS_KEY);
+
+  // ---------- Navigation ----------
+  document.querySelectorAll(".nav-item").forEach(item=>{
+    item.addEventListener("click", ()=>{
+      document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+      document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+      item.classList.add("active");
+      document.getElementById("page-" + item.dataset.page).classList.add("active");
+    });
+  });
+
+  // ---------- Utils ----------
+  function escapeHtml(str){
+    if(!str) return "";
+    return str.replace(/[&<>"']/g, m=>({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+  function formatDate(iso){
+    if(!iso) return "—";
+    const [y,m,d] = iso.split("-");
+    if(!y) return iso;
+    return `${d}/${m}/${y}`;
+  }
+  function calcAge(iso){
+    if(!iso) return null;
+    const dob = new Date(iso);
+    if(isNaN(dob)) return null;
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if(m < 0 || (m===0 && today.getDate() < dob.getDate())) age--;
+    return age;
+  }
+  function uid(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  // ---------- Live clock (đồng hồ trực tuyến) ----------
+  const WEEKDAYS_VI = ["Chủ nhật","Thứ hai","Thứ ba","Thứ tư","Thứ năm","Thứ sáu","Thứ bảy"];
+  function pad2(n){ return n.toString().padStart(2,"0"); }
+  function updateLiveClock(){
+    const now = new Date();
+    const timeStr = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
+    const dateStr = `${WEEKDAYS_VI[now.getDay()]}, ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()}`;
+    const timeEl = document.getElementById("live-clock-time");
+    const dateEl = document.getElementById("live-clock-date");
+    if(timeEl) timeEl.textContent = timeStr;
+    if(dateEl) dateEl.textContent = dateStr;
+  }
+  updateLiveClock();
+  setInterval(updateLiveClock, 1000);
+
+  // ---------- Image attachments (ảnh đính kèm) ----------
+  let currentPatientImages = [];
+
+  function handlePatientImages(event){
+    const files = Array.from(event.target.files || []);
+    files.forEach(file=>{
+      if(!file.type.startsWith("image/")) return;
+      const reader = new FileReader();
+      reader.onload = e=>{
+        currentPatientImages.push({ id: uid(), name: file.name, dataUrl: e.target.result });
+        renderPatientImagePreviews();
+      };
+      reader.onerror = ()=>{
+        alert("Không thể đọc ảnh: " + file.name);
+      };
+      reader.readAsDataURL(file);
+    });
+    event.target.value = ""; // cho phép chọn lại cùng file lần sau
+  }
+
+  function renderPatientImagePreviews(){
+    const box = document.getElementById("p-images-preview");
+    box.innerHTML = currentPatientImages.map(img => `
+      <div class="image-thumb">
+        <img src="${img.dataUrl}" alt="${escapeHtml(img.name)}" onclick="openImageModal('${img.id}', true)">
+        <button class="remove-x" onclick="removePatientImage('${img.id}')" title="Xóa ảnh">&times;</button>
+      </div>
+    `).join("");
+  }
+
+  function removePatientImage(id){
+    currentPatientImages = currentPatientImages.filter(img => img.id !== id);
+    renderPatientImagePreviews();
+  }
+
+  function openImageModal(srcOrId, isFromPreview){
+    let src = srcOrId;
+    if(isFromPreview){
+      const found = currentPatientImages.find(i => i.id === srcOrId);
+      if(found) src = found.dataUrl;
+    }
+    document.getElementById("img-modal-src").src = src;
+    document.getElementById("img-modal").classList.add("open");
+  }
+  function closeImageModal(event){
+    if(event.target.id === "img-modal" || event.target.classList.contains("close-modal")){
+      document.getElementById("img-modal").classList.remove("open");
+      document.getElementById("img-modal-src").src = "";
+    }
+  }
+
+  // ==================================================
+  // PATIENTS
+  // ==================================================
+  function openPatientForm(){
+    document.getElementById("patient-form-title").textContent = "Thêm bệnh nhân mới";
+    document.getElementById("patient-edit-id").value = "";
+    ["p-name","p-dob","p-address","p-phone","p-cccd","p-cccd-date","p-cccd-place","p-sale","p-note"]
+      .forEach(id => document.getElementById(id).value = "");
+    currentPatientImages = [];
+    renderPatientImagePreviews();
+    document.getElementById("patient-form-panel").classList.add("open");
+    document.getElementById("p-name").focus();
+  }
+  function closePatientForm(){
+    document.getElementById("patient-form-panel").classList.remove("open");
+  }
+  function savePatient(){
+    const name = document.getElementById("p-name").value.trim();
+    if(!name){
+      alert("Vui lòng nhập họ tên khách hàng.");
+      return;
+    }
+    const editId = document.getElementById("patient-edit-id").value;
+    const record = {
+      id: editId || uid(),
+      name,
+      dob: document.getElementById("p-dob").value,
+      address: document.getElementById("p-address").value.trim(),
+      phone: document.getElementById("p-phone").value.trim(),
+      cccd: document.getElementById("p-cccd").value.trim(),
+      cccdDate: document.getElementById("p-cccd-date").value,
+      cccdPlace: document.getElementById("p-cccd-place").value.trim(),
+      sale: document.getElementById("p-sale").value.trim(),
+      note: document.getElementById("p-note").value.trim(),
+      images: currentPatientImages.slice(),
+      createdAt: editId ? (patients.find(p=>p.id===editId)?.createdAt || Date.now()) : Date.now()
+    };
+    if(editId){
+      patients = patients.map(p => p.id === editId ? record : p);
+    }else{
+      patients.push(record);
+    }
+    saveData(PATIENTS_KEY, patients);
+    closePatientForm();
+    renderPatients();
+  }
+  function editPatient(id){
+    const p = patients.find(x => x.id === id);
+    if(!p) return;
+    document.getElementById("patient-form-title").textContent = "Chỉnh sửa hồ sơ bệnh nhân";
+    document.getElementById("patient-edit-id").value = p.id;
+    document.getElementById("p-name").value = p.name || "";
+    document.getElementById("p-dob").value = p.dob || "";
+    document.getElementById("p-address").value = p.address || "";
+    document.getElementById("p-phone").value = p.phone || "";
+    document.getElementById("p-cccd").value = p.cccd || "";
+    document.getElementById("p-cccd-date").value = p.cccdDate || "";
+    document.getElementById("p-cccd-place").value = p.cccdPlace || "";
+    document.getElementById("p-sale").value = p.sale || "";
+    document.getElementById("p-note").value = p.note || "";
+    currentPatientImages = (p.images || []).slice();
+    renderPatientImagePreviews();
+    document.getElementById("patient-form-panel").classList.add("open");
+    document.getElementById("patient-form-panel").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function deletePatient(id){
+    const p = patients.find(x => x.id === id);
+    if(!confirm(`Xóa hồ sơ của "${p ? p.name : "bệnh nhân này"}"? Hành động này không thể hoàn tác.`)) return;
+    patients = patients.filter(x => x.id !== id);
+    saveData(PATIENTS_KEY, patients);
+    renderPatients();
+  }
+
+  function renderPatients(){
+    const query = document.getElementById("patient-search").value.trim().toLowerCase();
+    const filtered = patients.filter(p=>{
+      if(!query) return true;
+      return (p.name||"").toLowerCase().includes(query)
+          || (p.phone||"").toLowerCase().includes(query)
+          || (p.cccd||"").toLowerCase().includes(query)
+          || (p.sale||"").toLowerCase().includes(query)
+          || (p.address||"").toLowerCase().includes(query);
+    }).sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+
+    document.getElementById("patient-count").textContent =
+      `${patients.length} hồ sơ` + (query ? ` · ${filtered.length} kết quả` : "");
+
+    const list = document.getElementById("patient-list");
+    if(filtered.length === 0){
+      list.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="icon">🗂️</div>
+          <h4>${patients.length===0 ? "Chưa có hồ sơ bệnh nhân nào" : "Không tìm thấy kết quả"}</h4>
+          <p>${patients.length===0 ? "Nhấn “+ Thêm bệnh nhân” để tạo hồ sơ đầu tiên." : "Thử từ khóa khác."}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(p=>{
+      const age = calcAge(p.dob);
+      return `
+      <div class="card">
+        <div class="card-tab"></div>
+        <div class="card-body">
+          <div class="card-name">${escapeHtml(p.name)}</div>
+          <div class="card-meta">${p.dob ? formatDate(p.dob) + (age!==null ? " · " + age + " tuổi" : "") : "Chưa có ngày sinh"}</div>
+          <div class="card-row"><span class="label">Địa chỉ:</span><span>${escapeHtml(p.address) || "—"}</span></div>
+          <div class="card-row"><span class="label">Điện thoại:</span><span>${escapeHtml(p.phone) || "—"}</span></div>
+          <div class="card-row"><span class="label">CCCD:</span><span>${escapeHtml(p.cccd) || "—"}</span></div>
+          ${p.sale ? `<div class="card-row"><span class="label">Sale CS:</span><span>${escapeHtml(p.sale)}</span></div>` : ""}
+          ${(p.cccdDate || p.cccdPlace) ? `<div class="card-row"><span class="label">Cấp ngày:</span><span>${p.cccdDate ? formatDate(p.cccdDate) : "—"}${p.cccdPlace ? " tại " + escapeHtml(p.cccdPlace) : ""}</span></div>` : ""}
+          ${p.note ? `<div class="card-note">${escapeHtml(p.note)}</div>` : ""}
+          ${(p.images && p.images.length) ? `<div class="card-images">${p.images.map(img=>`<img src="${img.dataUrl}" alt="${escapeHtml(img.name||'')}" onclick="openImageModal('${img.dataUrl}')">`).join("")}</div>` : ""}
+          <div class="card-actions">
+            <button class="btn btn-secondary btn-small" onclick="editPatient('${p.id}')">Sửa</button>
+            <button class="btn btn-danger btn-small" onclick="deletePatient('${p.id}')">Xóa</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  document.getElementById("patient-search").addEventListener("input", renderPatients);
+
+  // ==================================================
+  // DOCTORS
+  // ==================================================
+  function openDoctorForm(){
+    document.getElementById("doctor-form-title").textContent = "Thêm bác sĩ mới";
+    document.getElementById("doctor-edit-id").value = "";
+    ["d-name","d-age","d-address","d-workplace","d-phone","d-history","d-note"]
+      .forEach(id => document.getElementById(id).value = "");
+    document.getElementById("doctor-form-panel").classList.add("open");
+    document.getElementById("d-name").focus();
+  }
+  function closeDoctorForm(){
+    document.getElementById("doctor-form-panel").classList.remove("open");
+  }
+  function saveDoctor(){
+    const name = document.getElementById("d-name").value.trim();
+    if(!name){
+      alert("Vui lòng nhập họ tên bác sĩ.");
+      return;
+    }
+    const editId = document.getElementById("doctor-edit-id").value;
+    const record = {
+      id: editId || uid(),
+      name,
+      age: document.getElementById("d-age").value.trim(),
+      address: document.getElementById("d-address").value.trim(),
+      workplace: document.getElementById("d-workplace").value.trim(),
+      phone: document.getElementById("d-phone").value.trim(),
+      history: document.getElementById("d-history").value.trim(),
+      note: document.getElementById("d-note").value.trim(),
+      createdAt: editId ? (doctors.find(d=>d.id===editId)?.createdAt || Date.now()) : Date.now()
+    };
+    if(editId){
+      doctors = doctors.map(d => d.id === editId ? record : d);
+    }else{
+      doctors.push(record);
+    }
+    saveData(DOCTORS_KEY, doctors);
+    closeDoctorForm();
+    renderDoctors();
+  }
+  function editDoctor(id){
+    const d = doctors.find(x => x.id === id);
+    if(!d) return;
+    document.getElementById("doctor-form-title").textContent = "Chỉnh sửa hồ sơ bác sĩ";
+    document.getElementById("doctor-edit-id").value = d.id;
+    document.getElementById("d-name").value = d.name || "";
+    document.getElementById("d-age").value = d.age || "";
+    document.getElementById("d-address").value = d.address || "";
+    document.getElementById("d-workplace").value = d.workplace || "";
+    document.getElementById("d-phone").value = d.phone || "";
+    document.getElementById("d-history").value = d.history || "";
+    document.getElementById("d-note").value = d.note || "";
+    document.getElementById("doctor-form-panel").classList.add("open");
+    document.getElementById("doctor-form-panel").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function deleteDoctor(id){
+    const d = doctors.find(x => x.id === id);
+    if(!confirm(`Xóa hồ sơ của "${d ? d.name : "bác sĩ này"}"? Hành động này không thể hoàn tác.`)) return;
+    doctors = doctors.filter(x => x.id !== id);
+    saveData(DOCTORS_KEY, doctors);
+    renderDoctors();
+  }
+
+  function renderDoctors(){
+    const query = document.getElementById("doctor-search").value.trim().toLowerCase();
+    const filtered = doctors.filter(d=>{
+      if(!query) return true;
+      return (d.name||"").toLowerCase().includes(query)
+          || (d.workplace||"").toLowerCase().includes(query)
+          || (d.phone||"").toLowerCase().includes(query);
+    }).sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+
+    document.getElementById("doctor-count").textContent =
+      `${doctors.length} hồ sơ` + (query ? ` · ${filtered.length} kết quả` : "");
+
+    const list = document.getElementById("doctor-list");
+    if(filtered.length === 0){
+      list.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="icon">🩺</div>
+          <h4>${doctors.length===0 ? "Chưa có hồ sơ bác sĩ nào" : "Không tìm thấy kết quả"}</h4>
+          <p>${doctors.length===0 ? "Nhấn “+ Thêm bác sĩ” để tạo hồ sơ đầu tiên." : "Thử từ khóa khác."}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(d=>`
+      <div class="card">
+        <div class="card-tab" style="background:linear-gradient(90deg, var(--accent), #E0A272);"></div>
+        <div class="card-body">
+          <div class="card-name">${escapeHtml(d.name)}</div>
+          <div class="card-meta">${d.age ? d.age + " tuổi" : "Chưa rõ tuổi"}</div>
+          <div class="card-row"><span class="label">Nơi công tác:</span><span>${escapeHtml(d.workplace) || "—"}</span></div>
+          <div class="card-row"><span class="label">Địa chỉ:</span><span>${escapeHtml(d.address) || "—"}</span></div>
+          <div class="card-row"><span class="label">Điện thoại:</span><span>${escapeHtml(d.phone) || "—"}</span></div>
+          ${d.history ? `<div class="card-row"><span class="label">Quá trình:</span><span>${escapeHtml(d.history)}</span></div>` : ""}
+          ${d.note ? `<div class="card-note">${escapeHtml(d.note)}</div>` : ""}
+          <div class="card-actions">
+            <button class="btn btn-secondary btn-small" onclick="editDoctor('${d.id}')">Sửa</button>
+            <button class="btn btn-danger btn-small" onclick="deleteDoctor('${d.id}')">Xóa</button>
+          </div>
+        </div>
+      </div>`
+    ).join("");
+  }
+
+  document.getElementById("doctor-search").addEventListener("input", renderDoctors);
+
+  // ==================================================
+  // VOCAB (Từ vựng Tiếng Nhật)
+  // ==================================================
+  function openVocabForm(){
+    document.getElementById("vocab-form-title").textContent = "Thêm từ vựng mới";
+    document.getElementById("v-edit-id").value = "";
+    ["v-vi","v-ja","v-reading","v-note"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("vocab-form-panel").classList.add("open");
+    document.getElementById("v-vi").focus();
+  }
+  function closeVocabForm(){
+    document.getElementById("vocab-form-panel").classList.remove("open");
+  }
+  function saveVocab(){
+    const vi = document.getElementById("v-vi").value.trim();
+    const ja = document.getElementById("v-ja").value.trim();
+    if(!vi || !ja){
+      alert("Vui lòng nhập cả nghĩa tiếng Việt và từ tiếng Nhật.");
+      return;
+    }
+    const editId = document.getElementById("v-edit-id").value;
+    const record = {
+      id: editId || uid(),
+      vi,
+      ja,
+      reading: document.getElementById("v-reading").value.trim(),
+      note: document.getElementById("v-note").value.trim(),
+      createdAt: editId ? (vocab.find(v=>v.id===editId)?.createdAt || Date.now()) : Date.now()
+    };
+    if(editId){
+      vocab = vocab.map(v => v.id === editId ? record : v);
+    }else{
+      vocab.push(record);
+    }
+    saveData(VOCAB_KEY, vocab);
+    closeVocabForm();
+    renderVocab();
+  }
+  function editVocab(id){
+    const v = vocab.find(x => x.id === id);
+    if(!v) return;
+    document.getElementById("vocab-form-title").textContent = "Chỉnh sửa từ vựng";
+    document.getElementById("v-edit-id").value = v.id;
+    document.getElementById("v-vi").value = v.vi || "";
+    document.getElementById("v-ja").value = v.ja || "";
+    document.getElementById("v-reading").value = v.reading || "";
+    document.getElementById("v-note").value = v.note || "";
+    document.getElementById("vocab-form-panel").classList.add("open");
+    document.getElementById("vocab-form-panel").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function deleteVocab(id){
+    const v = vocab.find(x => x.id === id);
+    if(!confirm(`Xóa từ vựng "${v ? v.vi : "này"}"? Hành động này không thể hoàn tác.`)) return;
+    vocab = vocab.filter(x => x.id !== id);
+    saveData(VOCAB_KEY, vocab);
+    renderVocab();
+  }
+
+  function renderVocab(){
+    // Tìm kiếm hai chiều Việt <-> Nhật, không phân biệt hoa/thường
+    const query = document.getElementById("vocab-search").value.trim().toLowerCase();
+    const filtered = vocab.filter(v=>{
+      if(!query) return true;
+      return (v.vi||"").toLowerCase().includes(query)
+          || (v.ja||"").toLowerCase().includes(query)
+          || (v.reading||"").toLowerCase().includes(query);
+    }).sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+
+    document.getElementById("vocab-count").textContent =
+      `${vocab.length} từ` + (query ? ` · ${filtered.length} kết quả` : "");
+
+    const list = document.getElementById("vocab-list");
+    if(filtered.length === 0){
+      list.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="icon">🈶</div>
+          <h4>${vocab.length===0 ? "Chưa có từ vựng nào" : "Không tìm thấy kết quả"}</h4>
+          <p>${vocab.length===0 ? "Nhấn “+ Thêm từ vựng” để tạo mục đầu tiên." : "Thử từ khóa khác (tiếng Việt hoặc tiếng Nhật)."}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(v=>`
+      <div class="card">
+        <div class="card-tab" style="background:linear-gradient(90deg, #6E5CB4, #9B8DD9);"></div>
+        <div class="card-body">
+          <div class="card-name">${escapeHtml(v.ja)}</div>
+          <div class="card-meta">${escapeHtml(v.reading) || "—"}</div>
+          <div class="card-row"><span class="label">Tiếng Việt:</span><span>${escapeHtml(v.vi)}</span></div>
+          ${v.note ? `<div class="card-note">${escapeHtml(v.note)}</div>` : ""}
+          <div class="card-actions">
+            <button class="btn btn-secondary btn-small" onclick="editVocab('${v.id}')">Sửa</button>
+            <button class="btn btn-danger btn-small" onclick="deleteVocab('${v.id}')">Xóa</button>
+          </div>
+        </div>
+      </div>`
+    ).join("");
+  }
+
+  document.getElementById("vocab-search").addEventListener("input", renderVocab);
+
+  // ==================================================
+  // PARTNERS (Đối tác)
+  // ==================================================
+  function openPartnerForm(){
+    document.getElementById("partner-form-title").textContent = "Thêm đối tác mới";
+    document.getElementById("pt-edit-id").value = "";
+    ["pt-name","pt-dob","pt-address","pt-phone","pt-source"]
+      .forEach(id => document.getElementById(id).value = "");
+    document.getElementById("partner-form-panel").classList.add("open");
+    document.getElementById("pt-name").focus();
+  }
+  function closePartnerForm(){
+    document.getElementById("partner-form-panel").classList.remove("open");
+  }
+  function savePartner(){
+    const name = document.getElementById("pt-name").value.trim();
+    if(!name){
+      alert("Vui lòng nhập họ tên đối tác.");
+      return;
+    }
+    const editId = document.getElementById("pt-edit-id").value;
+    const record = {
+      id: editId || uid(),
+      name,
+      dob: document.getElementById("pt-dob").value,
+      address: document.getElementById("pt-address").value.trim(),
+      phone: document.getElementById("pt-phone").value.trim(),
+      source: document.getElementById("pt-source").value.trim(),
+      createdAt: editId ? (partners.find(p=>p.id===editId)?.createdAt || Date.now()) : Date.now()
+    };
+    if(editId){
+      partners = partners.map(p => p.id === editId ? record : p);
+    }else{
+      partners.push(record);
+    }
+    saveData(PARTNERS_KEY, partners);
+    closePartnerForm();
+    renderPartners();
+  }
+  function editPartner(id){
+    const p = partners.find(x => x.id === id);
+    if(!p) return;
+    document.getElementById("partner-form-title").textContent = "Chỉnh sửa hồ sơ đối tác";
+    document.getElementById("pt-edit-id").value = p.id;
+    document.getElementById("pt-name").value = p.name || "";
+    document.getElementById("pt-dob").value = p.dob || "";
+    document.getElementById("pt-address").value = p.address || "";
+    document.getElementById("pt-phone").value = p.phone || "";
+    document.getElementById("pt-source").value = p.source || "";
+    document.getElementById("partner-form-panel").classList.add("open");
+    document.getElementById("partner-form-panel").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function deletePartner(id){
+    const p = partners.find(x => x.id === id);
+    if(!confirm(`Xóa hồ sơ của "${p ? p.name : "đối tác này"}"? Hành động này không thể hoàn tác.`)) return;
+    partners = partners.filter(x => x.id !== id);
+    saveData(PARTNERS_KEY, partners);
+    renderPartners();
+  }
+
+  function renderPartners(){
+    const query = document.getElementById("partner-search").value.trim().toLowerCase();
+    const filtered = partners.filter(p=>{
+      if(!query) return true;
+      return (p.name||"").toLowerCase().includes(query)
+          || (p.phone||"").toLowerCase().includes(query)
+          || (p.source||"").toLowerCase().includes(query)
+          || (p.address||"").toLowerCase().includes(query);
+    }).sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+
+    document.getElementById("partner-count").textContent =
+      `${partners.length} hồ sơ` + (query ? ` · ${filtered.length} kết quả` : "");
+
+    const list = document.getElementById("partner-list");
+    if(filtered.length === 0){
+      list.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="icon">🤝</div>
+          <h4>${partners.length===0 ? "Chưa có hồ sơ đối tác nào" : "Không tìm thấy kết quả"}</h4>
+          <p>${partners.length===0 ? "Nhấn “+ Thêm đối tác” để tạo hồ sơ đầu tiên." : "Thử từ khóa khác."}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(p=>{
+      const age = calcAge(p.dob);
+      return `
+      <div class="card">
+        <div class="card-tab" style="background:linear-gradient(90deg, #2E7D6B, #5FBFA3);"></div>
+        <div class="card-body">
+          <div class="card-name">${escapeHtml(p.name)}</div>
+          <div class="card-meta">${p.dob ? formatDate(p.dob) + (age!==null ? " · " + age + " tuổi" : "") : "Chưa có ngày sinh"}</div>
+          <div class="card-row"><span class="label">Địa chỉ:</span><span>${escapeHtml(p.address) || "—"}</span></div>
+          <div class="card-row"><span class="label">Điện thoại:</span><span>${escapeHtml(p.phone) || "—"}</span></div>
+          ${p.source ? `<div class="card-note">Giới thiệu bởi: ${escapeHtml(p.source)}</div>` : ""}
+          <div class="card-actions">
+            <button class="btn btn-secondary btn-small" onclick="editPartner('${p.id}')">Sửa</button>
+            <button class="btn btn-danger btn-small" onclick="deletePartner('${p.id}')">Xóa</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  document.getElementById("partner-search").addEventListener("input", renderPartners);
+
+  // ==================================================
+  // EMPLOYEES (Hồ sơ Nhân viên)
+  // ==================================================
+  function openEmployeeForm(){
+    document.getElementById("employee-form-title").textContent = "Thêm nhân viên mới";
+    document.getElementById("e-edit-id").value = "";
+    ["e-name","e-dob","e-address","e-phone","e-position","e-contract"]
+      .forEach(id => document.getElementById(id).value = "");
+    document.getElementById("employee-form-panel").classList.add("open");
+    document.getElementById("e-name").focus();
+  }
+  function closeEmployeeForm(){
+    document.getElementById("employee-form-panel").classList.remove("open");
+  }
+  function saveEmployee(){
+    const name = document.getElementById("e-name").value.trim();
+    if(!name){
+      alert("Vui lòng nhập họ tên nhân viên.");
+      return;
+    }
+    const editId = document.getElementById("e-edit-id").value;
+    const record = {
+      id: editId || uid(),
+      name,
+      dob: document.getElementById("e-dob").value,
+      address: document.getElementById("e-address").value.trim(),
+      phone: document.getElementById("e-phone").value.trim(),
+      position: document.getElementById("e-position").value.trim(),
+      contract: document.getElementById("e-contract").value.trim(),
+      createdAt: editId ? (employees.find(e=>e.id===editId)?.createdAt || Date.now()) : Date.now()
+    };
+    if(editId){
+      employees = employees.map(e => e.id === editId ? record : e);
+    }else{
+      employees.push(record);
+    }
+    saveData(EMPLOYEES_KEY, employees);
+    closeEmployeeForm();
+    renderEmployees();
+  }
+  function editEmployee(id){
+    const e = employees.find(x => x.id === id);
+    if(!e) return;
+    document.getElementById("employee-form-title").textContent = "Chỉnh sửa hồ sơ nhân viên";
+    document.getElementById("e-edit-id").value = e.id;
+    document.getElementById("e-name").value = e.name || "";
+    document.getElementById("e-dob").value = e.dob || "";
+    document.getElementById("e-address").value = e.address || "";
+    document.getElementById("e-phone").value = e.phone || "";
+    document.getElementById("e-position").value = e.position || "";
+    document.getElementById("e-contract").value = e.contract || "";
+    document.getElementById("employee-form-panel").classList.add("open");
+    document.getElementById("employee-form-panel").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function deleteEmployee(id){
+    const e = employees.find(x => x.id === id);
+    if(!confirm(`Xóa hồ sơ của "${e ? e.name : "nhân viên này"}"? Hành động này không thể hoàn tác.`)) return;
+    employees = employees.filter(x => x.id !== id);
+    saveData(EMPLOYEES_KEY, employees);
+    renderEmployees();
+  }
+
+  function renderEmployees(){
+    const query = document.getElementById("employee-search").value.trim().toLowerCase();
+    const filtered = employees.filter(e=>{
+      if(!query) return true;
+      return (e.name||"").toLowerCase().includes(query)
+          || (e.phone||"").toLowerCase().includes(query)
+          || (e.position||"").toLowerCase().includes(query)
+          || (e.contract||"").toLowerCase().includes(query)
+          || (e.address||"").toLowerCase().includes(query);
+    }).sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+
+    document.getElementById("employee-count").textContent =
+      `${employees.length} hồ sơ` + (query ? ` · ${filtered.length} kết quả` : "");
+
+    const list = document.getElementById("employee-list");
+    if(filtered.length === 0){
+      list.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="icon">🧑‍💼</div>
+          <h4>${employees.length===0 ? "Chưa có hồ sơ nhân viên nào" : "Không tìm thấy kết quả"}</h4>
+          <p>${employees.length===0 ? "Nhấn “+ Thêm nhân viên” để tạo hồ sơ đầu tiên." : "Thử từ khóa khác."}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(e=>{
+      const age = calcAge(e.dob);
+      return `
+      <div class="card">
+        <div class="card-tab" style="background:linear-gradient(90deg, var(--primary), var(--primary-light));"></div>
+        <div class="card-body">
+          <div class="card-name">${escapeHtml(e.name)}</div>
+          <div class="card-meta">${e.dob ? formatDate(e.dob) + (age!==null ? " · " + age + " tuổi" : "") : "Chưa có ngày sinh"}</div>
+          <div class="card-row"><span class="label">Vị trí:</span><span>${escapeHtml(e.position) || "—"}</span></div>
+          <div class="card-row"><span class="label">Hợp đồng:</span><span>${escapeHtml(e.contract) || "—"}</span></div>
+          <div class="card-row"><span class="label">Địa chỉ:</span><span>${escapeHtml(e.address) || "—"}</span></div>
+          <div class="card-row"><span class="label">Điện thoại:</span><span>${escapeHtml(e.phone) || "—"}</span></div>
+          <div class="card-actions">
+            <button class="btn btn-secondary btn-small" onclick="editEmployee('${e.id}')">Sửa</button>
+            <button class="btn btn-danger btn-small" onclick="deleteEmployee('${e.id}')">Xóa</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  document.getElementById("employee-search").addEventListener("input", renderEmployees);
+
+  // ==================================================
+  // TASKS (Công việc cá nhân)
+  // ==================================================
+  function openTaskForm(){
+    document.getElementById("task-form-title").textContent = "Thêm công việc mới";
+    document.getElementById("t-edit-id").value = "";
+    document.getElementById("t-content").value = "";
+    document.getElementById("t-progress").value = 0;
+    document.getElementById("t-progress-value").textContent = "0%";
+    document.getElementById("t-status").value = "pending";
+    document.getElementById("t-due").value = "";
+    document.getElementById("task-form-panel").classList.add("open");
+    document.getElementById("t-content").focus();
+  }
+  function closeTaskForm(){
+    document.getElementById("task-form-panel").classList.remove("open");
+  }
+  function saveTask(){
+    const content = document.getElementById("t-content").value.trim();
+    if(!content){
+      alert("Vui lòng nhập nội dung công việc.");
+      return;
+    }
+    const editId = document.getElementById("t-edit-id").value;
+    let status = document.getElementById("t-status").value;
+    let progress = parseInt(document.getElementById("t-progress").value, 10) || 0;
+    if(status === "done") progress = 100; // đã hoàn thành thì tiến độ luôn 100%
+    const record = {
+      id: editId || uid(),
+      content,
+      progress,
+      status,
+      due: document.getElementById("t-due").value,
+      createdAt: editId ? (tasks.find(t=>t.id===editId)?.createdAt || Date.now()) : Date.now()
+    };
+    if(editId){
+      tasks = tasks.map(t => t.id === editId ? record : t);
+    }else{
+      tasks.push(record);
+    }
+    saveData(TASKS_KEY, tasks);
+    closeTaskForm();
+    renderTasks();
+  }
+  function editTask(id){
+    const t = tasks.find(x => x.id === id);
+    if(!t) return;
+    document.getElementById("task-form-title").textContent = "Chỉnh sửa công việc";
+    document.getElementById("t-edit-id").value = t.id;
+    document.getElementById("t-content").value = t.content || "";
+    document.getElementById("t-progress").value = t.progress || 0;
+    document.getElementById("t-progress-value").textContent = (t.progress || 0) + "%";
+    document.getElementById("t-status").value = t.status || "pending";
+    document.getElementById("t-due").value = t.due || "";
+    document.getElementById("task-form-panel").classList.add("open");
+    document.getElementById("task-form-panel").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function deleteTask(id){
+    if(!confirm("Xóa công việc này? Hành động này không thể hoàn tác.")) return;
+    tasks = tasks.filter(x => x.id !== id);
+    saveData(TASKS_KEY, tasks);
+    renderTasks();
+  }
+  function toggleTaskDone(id){
+    const t = tasks.find(x => x.id === id);
+    if(!t) return;
+    if(t.status === "done"){
+      t.status = "pending";
+      t.progress = t.progress >= 100 ? 90 : t.progress;
+    }else{
+      t.status = "done";
+      t.progress = 100;
+    }
+    saveData(TASKS_KEY, tasks);
+    renderTasks();
+  }
+
+  function isOverdue(t){
+    if(!t.due || t.status === "done") return false;
+    const due = new Date(t.due);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    return due < today;
+  }
+
+  function renderTasks(){
+    const query = document.getElementById("task-search").value.trim().toLowerCase();
+    const filtered = tasks.filter(t=>{
+      if(!query) return true;
+      return (t.content||"").toLowerCase().includes(query);
+    }).sort((a,b)=>{
+      // Việc chưa hoàn thành lên trước, sắp xếp theo hạn gần nhất; việc đã xong xuống cuối
+      if(a.status !== b.status) return a.status === "done" ? 1 : -1;
+      if(a.due && b.due) return new Date(a.due) - new Date(b.due);
+      if(a.due) return -1;
+      if(b.due) return 1;
+      return (b.createdAt||0) - (a.createdAt||0);
+    });
+
+    document.getElementById("task-count").textContent =
+      `${tasks.length} việc` + (query ? ` · ${filtered.length} kết quả` : "");
+
+    const list = document.getElementById("task-list");
+    if(filtered.length === 0){
+      list.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="icon">📋</div>
+          <h4>${tasks.length===0 ? "Chưa có công việc nào" : "Không tìm thấy kết quả"}</h4>
+          <p>${tasks.length===0 ? "Nhấn “+ Thêm công việc” để tạo mục đầu tiên." : "Thử từ khóa khác."}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(t=>{
+      const overdue = isOverdue(t);
+      return `
+      <div class="card">
+        <div class="card-tab" style="background:${t.status==='done' ? 'linear-gradient(90deg, #2E7D6B, #5FBFA3)' : 'linear-gradient(90deg, var(--primary), var(--primary-light))'};"></div>
+        <div class="card-body">
+          <div class="card-name" style="font-size:15px; ${t.status==='done' ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${escapeHtml(t.content)}</div>
+          <div style="margin-top:8px;">
+            <span class="status-badge ${t.status==='done' ? 'done' : 'pending'}">${t.status==='done' ? 'Đã hoàn thành' : 'Chưa hoàn thành'}</span>
+          </div>
+          <div class="task-progress-track"><div class="task-progress-fill" style="width:${t.progress||0}%;"></div></div>
+          <div class="task-progress-label">${t.progress||0}%</div>
+          <div class="task-due ${overdue ? 'overdue' : ''}">
+            ${t.due ? (overdue ? "Quá hạn — dự kiến " : "Dự kiến hoàn thành: ") + formatDate(t.due) : "Chưa đặt thời hạn"}
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-secondary btn-small" onclick="toggleTaskDone('${t.id}')">${t.status==='done' ? 'Đánh dấu chưa xong' : 'Đánh dấu hoàn thành'}</button>
+            <button class="btn btn-secondary btn-small" onclick="editTask('${t.id}')">Sửa</button>
+            <button class="btn btn-danger btn-small" onclick="deleteTask('${t.id}')">Xóa</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  document.getElementById("task-search").addEventListener("input", renderTasks);
+
+  // ---------- Initial render ----------
+  renderPatients();
+  renderDoctors();
+  renderVocab();
+  renderPartners();
+  renderEmployees();
+  renderTasks();
+</script>
+
+</body>
+</html>
